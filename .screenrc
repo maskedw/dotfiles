@@ -1,0 +1,273 @@
+hardstatus alwayslastline "[%02c] %`%-w%{=b bw}%n %t%{-}%+w"
+attrcolor b ".I"
+defbce on
+
+
+defencoding utf8
+encoding utf8
+
+defbce "on"
+# 太字には明るい色を使う(^[はvimでC-v ESCで入力する)
+attrcolor b "^["
+#termcapinfo xterm 'Co#256:AB=\E[48;5;%dm:AF=\E[38;5;%dm;ti@:te@'
+# スクロールバッファの行数
+defscrollback 5000
+# 別画面サポート。Vimやless使うときに便利
+altscreen on
+# ビジュアルベル（画面全体が点滅する）を切る
+vbell off
+# ベルの時はメッセージ（＋音）を出す(^GはvimでC-v C-gで入力する)
+#bell_msg "Bell in window %^G"
+# 端末が落ちたら自動的にデタッチする
+autodetach on
+# 新しいウィンドウを生成するときのコマンド
+shell $SHELL
+# スタートアップメッセージを消す
+startup_message off
+# ログファイルのファイル名
+logfile "$HOME/.screen/screen-%Y%m%d-%n.log"
+logtstamp on
+logtstamp string "\n-- SCREEN [%Y/%m/%d %02c:%s] %n:%t --\n"
+hardcopydir "$HOME/.screen/hardcopy"
+#hardcopy_append on
+# 標準でログをとる
+deflog on
+# ウィンドウのタイトル指定
+shelltitle '$ |zsh'
+#メッセージを表示する時間(秒単位)
+msgwait 5
+#次のメッセージを表示するまでの遅延時間(秒単位)
+msgminwait 1
+
+# hardstatus and caption
+hardstatus on
+hardstatus alwayslastline '%{= .b}%H%{-} %L=%-w%45L>%{=u b.}%n %t%{-}%+w %-17<%=%m/%d %02c:%s'
+caption always '%?%F%{= bw}%:%{= wk}%?%2n%f%07=%t%='
+sorendition '+r .b'
+
+# Prefixキーの設定
+escape ^Ww
+
+#ウィンドウ操作モード(^t w でウィンドウを連続的に操作できるようになる)
+bind w eval 'echo "Operate window"' 'command -c operate'
+bind -c operate ^]  command
+bind -c operate j eval 'focus down' 'command -c operate'
+bind -c operate k eval 'focus up' 'command -c operate'
+bind -c operate h eval 'focus left' 'command -c operate'
+bind -c operate l eval 'focus right' 'command -c operate'
+bind -c operate t eval 'focus top' 'command -c operate'
+bind -c operate b eval 'focus bottom' 'command -c operate'
+bind -c operate K eval 'resize -v +6' 'command -c operate'
+bind -c operate J eval 'resize -v -6' 'command -c operate'
+bind -c operate L eval 'resize -h +6' 'command -c operate'
+bind -c operate H eval 'resize -h -6' 'command -c operate'
+bind -c operate 0 eval 'select 0' 'command -c operate'
+bind -c operate 1 eval 'select 1' 'command -c operate'
+bind -c operate 2 eval 'select 2' 'command -c operate'
+bind -c operate 3 eval 'select 3' 'command -c operate'
+bind -c operate 4 eval 'select 4' 'command -c operate'
+bind -c operate 5 eval 'select 5' 'command -c operate'
+bind -c operate 6 eval 'select 6' 'command -c operate'
+bind -c operate 7 eval 'select 7' 'command -c operate'
+bind -c operate 8 eval 'select 8' 'command -c operate'
+bind -c operate 9 eval 'select 9' 'command -c operate'
+
+#通常の操作キー
+bind W windowlist
+bind C eval "hardcopy -h $HOME/.screen/hardcopy/hardcopy.log"
+bind c eval 'hardcopy'
+bind e eval 'screen'
+bind j eval 'focus down'
+bind k eval 'focus up'
+bind h eval 'focus left'
+bind l eval 'focus right'
+bind K eval 'resize -v +6'
+bind J eval 'resize -v -6'
+bind L eval 'resize -h +6'
+bind H eval 'resize -h -6'
+bind v eval 'split -v' focus screen
+bind s eval 'split' focus screen
+bind ^k eval 'resize -v ='
+bind ^j eval 'resize -v ='
+bind ^h eval 'resize -h +'
+bind ^l eval 'resize -h +'
+bind q eval 'remove'
+bind Q eval 'kill'
+bind r eval "source ~/.screenrc"
+
+# display all windows in a table for visual window selection. (")
+# override default `w'(windows) mapping.
+windowlist title 'Num Title%=Flags'
+
+
+#^t h との誤爆を防ぐために^t ^hは無効にする
+bind ^h
+#画面ロック？１画面に戻ってうざいので無効にする。
+bind x
+
+# trigger for layout sub-commands
+bind ^Y eval 'command -c layout' 'layout show'
+bind y  eval 'command -c layout' 'layout show'
+
+# create/remove layout
+bind -c layout c eval 'layout new'    'layout show'
+bind -c layout X eval 'layout remove' 'layout show'
+
+# change the current layout title or number
+bind -c layout A colon 'layout title '
+bind -c layout N colon 'layout number '
+
+# switch to the layout identified by number or title (not prefix of a title)
+bind -c layout \' eval 'layout select' 'layout show'
+
+# switch to other layout
+bind -c layout n eval 'layout next'     'layout show'
+bind -c layout p eval 'layout prev'     'layout show'
+bind -c layout 0 eval 'layout select 0' 'layout show'
+bind -c layout 1 eval 'layout select 1' 'layout show'
+bind -c layout 2 eval 'layout select 2' 'layout show'
+bind -c layout 3 eval 'layout select 3' 'layout show'
+bind -c layout 4 eval 'layout select 4' 'layout show'
+bind -c layout 5 eval 'layout select 5' 'layout show'
+bind -c layout 6 eval 'layout select 6' 'layout show'
+bind -c layout 7 eval 'layout select 7' 'layout show'
+bind -c layout 8 eval 'layout select 8' 'layout show'
+bind -c layout 9 eval 'layout select 9' 'layout show'
+
+# continuous switch to other layout
+bind -c layout ^N eval 'layout next' 'command -c layout' 'layout show'
+bind -c layout ^P eval 'layout prev' 'command -c layout' 'layout show'
+
+# bindkey -mでcopy modeでのキーバインド設定を変更できる
+bindkey -m ' ' eval 'stuff \040' 'writebuf' 'exec sh -c "xsel -i -b < /tmp/screen-exchange"'
+bindkey -m Y   eval 'stuff Y'    'writebuf' 'exec sh -c "xsel -i -b < /tmp/screen-exchange"'
+bindkey -m W   eval 'stuff W'    'writebuf' 'exec sh -c "xsel -i -b < /tmp/screen-exchange"'
+
+# Give me some info at the bottom of each window and the bottom of screen like scrollable tabbed bar.
+# e.g.:
+# +----------------------------------------------------------------------------+
+# |                                                                            |
+# |                                                                            |
+# |                                                                            |
+# |                                                                            |
+# +----------------------------------------------------------------------------+
+# | 0$    top                                                                  | <--- caption (bellow each window)
+# +----------------------------------------------------------------------------+
+# |                                                                            |
+# |                                                                            |
+# |                                                                            |
+# |                                                                            |
+# |                                                                            |
+# |                                                                            |
+# +----------------------------------------------------------------------------+
+# | 2$    vim                                                                  | <--- caption
+# +----------------------------------------------------------------------------+
+# |                                                                            |
+# |                                                                            |
+# +----------------------------------------------------------------------------+
+# | 3$(L) tail                                                                 | <--- caption
+# +----------------------------------------------------------------------------+
+# |[09/24 13:23:43]0 top  1 man  2 vim  3 tail  11 less  21 ssh  22 ssh  31 ssh| <--- hardstatus
+# +----------------------------------------------------------------------------+
+
+caption always "%?%F%{= wW}%:%{= wk}%?%2n%f%07=%t%="
+# caption description:
+#
+# %?          - Start of a conditional statement.
+#  %F         - Use this part of the statement if the window has focus (i.e. it
+#               is the only window or the currently active one).
+#  %{= bW}    - bright white on blue.
+# %:          - else
+#  %{= wk}    - black on white
+# %?          - End conditional statement.
+#  %2n        - number of the current window with left 2 padding
+#  %f         - flags for current window
+#  %07=       - left 7 padding for window number and flags
+#  %t         - title of current window
+#  %=         - truncation/padding point
+
+hardstatus alwayslastline "%{= Wb}[%m/%d %02c]%016=%{= WK}%-w%50>%{= bW}%n %t%{-}%+w%-0< %="
+# hardstatus description:
+#
+# %{= Wb}     - blue on bright white
+#  %m         - Two-letter month number
+#  %d         - Two-letter day number
+#  %02c       - time (hh:mm) in 24 hour format
+#  %s         - seconds
+#  %016=      - left 16 padding for datetime
+# %{= WK}     - white on bright white
+#  %-w        - window list up to but not including the current window (-)
+#  %50>       - truncation/padding marker; place this point about 50% of the
+#               way into the display area (50)
+# %{=u bW}    - underline, blue on bright white
+#  %n         - number of the current window
+#  %t         - title of current window
+# %{-}        - undo last color change(so now we're back to white on bright white)
+#  %+w        - window list from the next window on (-)
+#  %-0<       - truncation/padding point. place this point zero spaces (0)
+#               from the right margin (-).
+#  %=         - truncation/paddion point.
+
+# APPENDIX: STRING ESCAPES (make extracts from screen (1))
+#
+# The attribute set can either be specified as hexadecimal number
+# or a combination of the following letters:
+#
+#   d     dim
+#   u     underline
+#   b     bold
+#   r     reverse
+#   s     standout
+#   B     blinking
+#
+# Colors are coded either as a hexadecimal number or two letters specifying
+# the desired background and foreground color (in that order).
+# The following colors are known:
+#
+#   k     black
+#   r     red
+#   g     green
+#   y     yellow
+#   b     blue
+#   m     magenta
+#   c     cyan
+#   w     white
+#   d     default color
+#   .     leave color unchanged
+#
+# The capitalized versions of the letter specify bright colors.
+# You can also use the pseudo-color `i' to set just the brightness and leave the color unchanged.
+
+sorendition "+rb .G"
+
+## 256色表示設定
+termcapinfo xterm 'Co#256:AB=\E[48;5;%dm:AF=\E[38;5;%dm'
+
+source ~/.screenrc.layout
+
+#
+#zombie
+#
+## To  use mouse.   XT capability  is screen  specific, not  seen in  the system
+## termcap / terminfo.
+#termcapinfo * XT
+#
+## Z0/Z1 are also screen specific.
+#termcapinfo xterm*|kterm*|screen* Z0=\E[?3h:Z1=\E[?3l
+#
+## To use hardware status line
+#termcapinfo xterm*|kterm*|screen* hs:ts=\E]0;:fs=\007:ds=\E]0;\007
+#hardstatus on
+#
+## To use 256 colors. AB/AF are also screen specific.
+#termcapinfo xterm*|kterm*|screen* Co#256:pa#32767:AB=\E[48;5;%dm:AF=\E[38;5;%dm
+#defbce on
+#
+## To use resize-window
+#termcapinfo xterm*|kterm*|screen* is=\E[r\E[m\E[2J\E[H\E[?7h\E[?1;4;6l
+#
+#termcapinfo screen* OL=8196
+#termcapinfo xterm* OL=256
+#
+#hardstatus string "%?%h%:%t (screen #%n on %H)%?"
+#caption always "%{=r dd}%-Lw%40L>%?%F%{=b dR}%:[%? %n%f %t %?%F%{-}%:]%?%+Lw %?%F%-024=GNU Screen%:%=%?"

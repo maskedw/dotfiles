@@ -1,0 +1,45 @@
+# create window
+screen 0
+screen 1
+screen 2
+screen 3
+
+# create layout
+#layout new 0:layout0:vertical
+layout new 0:3pain_top
+layout new 1:3pain_right
+layout new 2:dummy
+layout new 3
+
+# setup layout0
+layout select 0
+split
+select 0
+focus down
+split -v
+select 1
+focus right
+select 2
+focus top
+select 0
+
+layout select 1
+split -v
+focus right
+select 2
+focus left
+split 
+focus down
+select 1
+focus up
+select 0
+
+## setup layout2
+layout remove dummy
+layout select 3
+layout number 2
+layout title single
+
+## select layout0
+layout select 0
+layout show
