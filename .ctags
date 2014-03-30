@@ -1,0 +1,24 @@
+--exclude=doc/
+--exclude=.git/
+--exclude=.svn/
+--exclude=lib/
+--exclude=build/
+--exclude=bin/
+--exclude=html/
+--exclude=doxygen/
+--exclude=*.html
+--exclude=*.txt
+--exclude=*.log
+--exclude=*.bak
+--exclude=*.tmp
+--langdef=wiki
+--langmap=wiki:.wiki
+--regex-wiki=/^=[ \t]+(.+)[ \t]+=$/\1/h,header/
+--regex-wiki=/^==[ \t]+(.+)[ \t]+==$/. \1/h,header/
+--regex-wiki=/^===[ \t]+(.+)[ \t]+===$/.   \1/h,header/
+--regex-wiki=/^====[ \t]+(.+)[ \t]+====$/.     \1/h,header/
+--regex-wiki=/^=====[ \t]+(.+)[ \t]+=====$/.       \1/h,header/
+--regex-wiki=/^======[ \t]+(.+)[ \t]+======$/.         \1/h,header/
+--fields=+iaS
+--extra=+fq
+--file-scope=yes
