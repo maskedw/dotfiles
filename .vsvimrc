@@ -1,0 +1,15 @@
+"set vsvim_useeditordefaults
+set novsvim_useeditorindent
+set vsvim_useeditordefaults
+
+"set clipboard=unnamed
+set clipboard=autoselect
+set shiftwidth=4
+set expandtab
+set autoindent
+set tabstop=4
+
+nmap <C-O> :vsc View.NavigateBackward<CR>
+nmap <C-I> :vsc View.NavigateForward<CR>
+nmap <C-]> :vsc Edit.GoToDefinition<CR>
+
