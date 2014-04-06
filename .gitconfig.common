@@ -1,0 +1,18 @@
+[user]
+    email = maskedw00@gmail.com
+    name = MaskedW
+
+
+[core]
+    autocrlf = true
+    excludesfile = ~/.gitignore
+
+
+[color]
+    ui = auto
+
+
+[alias]
+    history = log --pretty=format:\\\"%h %ad | %s%d [%an]\\\" --graph --date=short
+    tree = log --graph --all --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(bold white)— %an%C(reset)%C(bold yellow)%d%C(reset)' --abbrev-commit --date=relative
+

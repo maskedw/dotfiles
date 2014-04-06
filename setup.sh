@@ -34,12 +34,13 @@ TARGET=".vimrc .gvimrc .vsvimrc "
 TARGET+=".gdbinit .ctags .gitignore .gitconfig.common"
 for f in $TARGET ; do
     echo $f
-    #ln -siv $PWD/$f $HOME/$f
+    ln -siv $PWD/$f $HOME/$f
 done
 
 TARGET=".gitconfig.unix"
 for f in $TARGET ; do
     echo $f
     #f=`echo $f | sed s/\.unix//g`
-    echo `echo $f | sed s/\.unix//g`
+    #echo `echo $f | sed s/\.unix//g`
+    ln -siv $PWD/$f $HOME/`echo $f | sed s/\.unix//g`
 done
