@@ -1,0 +1,90 @@
+# archves
+*.zip
+*.tar.gz
+*.7zip
+*.rar
+*.bz2
+
+# C/C++
+## object file
+*.o
+## depend file
+*.d
+## static lib
+*.a
+## dynamic lib
+*.so
+*.so.*
+## disassembly
+*.dis
+## mapfile
+*.map
+# Documets
+[Dd]oc/*
+[Dd]oxygen/*
+[Dd]oxygen_output/*
+*/[Dd]oxygen_output/*
+
+# Dot files
+.*
+!/.local.vimrc
+!/.pyclewn.project
+!/.clang_complete
+!/.gitignore
+!/.gitmodules
+
+# Tag files
+tagfiles/*
+tags
+# cscope
+*.out
+
+# Build results
+
+[Dd]ebug/*
+[Rr]elease/*
+
+# Atmel studio
+*.atsln
+*.atsuo
+*.cproj
+*.eep
+*.srec
+*.lss
+
+# Binary
+bin/*
+*.elf
+*.hex
+*.mot
+*.bin
+## Renenas obj
+*.obj
+*.lib
+*.rxc
+*.lbp
+*.hdp
+*.hdp
+*.hlk
+*.pi
+*.rxa
+*.abs
+*.rxg
+*.ti
+
+
+
+# library
+lib/*
+
+
+# Others
+*.bak
+*.log
+*.swp
+*.gdb
+*.cpio
+*.ttf
+*.png
+*.jpg
+
