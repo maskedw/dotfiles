@@ -3,7 +3,7 @@ setlocal ENABLEDELAYEDEXPANSION
 
 set PWD=%CD%
 set TARGET=.vimrc .gvimrc .vsvimrc
-set TARGET=%TARGET% .gdbinit .ctags .gitignore
+set TARGET=%TARGET% .gdbinit .ctags .gitignore .gitconfig.common
 
 for %%f in (%TARGET%) do (
     if exist %%f echo %%f
