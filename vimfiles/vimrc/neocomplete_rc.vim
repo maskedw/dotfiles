@@ -74,3 +74,11 @@ let g:neocomplete#force_omni_input_patterns.objc =
 let g:neocomplete#force_omni_input_patterns.objcpp =
       \ '[^.[:digit:] *\t]\%(\.\|->\)\|\h\w*::'
 
+
+call neocomplete#custom#source('file', 'rank', 10)
+" 使用する補完の種類を減らす
+" 現在のSourceの取得は `:echo keys(neocomplete#variables#get_sources())`
+" デフォルト: ['file', 'tag', 'neosnippet', 'vim', 'dictionary', 'omni', 'member', 'syntax', 'include', 'buffer', 'file/include']
+let g:neocomplete#sources = {
+  \ '_' : ['file', 'neosnippet', 'syntax', 'member', 'omni', 'include', 'vim', 'buffer', 'file/include']
+  \ }

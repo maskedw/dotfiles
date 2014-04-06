@@ -1,5 +1,6 @@
 "" vi互換off
 set nocompatible
+syntax enable
 set encoding=utf-8
 if has('win32') || has('win64')
     set runtimepath+=~/vimfiles/
@@ -9,12 +10,21 @@ else
     set fileformat=unix
 endif
 
+if has('vim_starting')
+    filetype off
+    filetype plugin indent off
+    set runtimepath+=~/bundle/neobundle.vim/,~/.vim/after
+    call neobundle#rc(expand('~/bundle/'))
+    filetype on
+    filetype plugin indent on
+endif
+
 
 runtime! vimrc/basic.vim
 
 runtime! vimrc/pyclewn_rc.vim
 
-"NeoBundleの色々な指定方法
+""NeoBundleの色々な指定方法
 "NeoBundle 'https://github.com/Shougo/neocomplete.vim.git'
 "NeoBundle 'Shougo/neosnippet'
 "NeoBundle 'Shougo/vimfiler', '9dbf244928a939b4e885225954d46afba133382f'
@@ -32,11 +42,6 @@ runtime! vimrc/clang_complete_rc.vim
 
 NeoBundle 'Shougo/neosnippet'
 runtime! vimrc/neosnippet_rc.vim
-
-
-" grep
-NeoBundle 'https://github.com/fuenor/qfixgrep.git'
-runtime! vimrc/qfixgrep_rc.vim
 
 
 "Vim内ファイラー
@@ -102,11 +107,6 @@ NeoBundle 'https://github.com/wesleyche/SrcExpl.git'
 runtime! vimrc/SrcExpl_rc.vim
 
 
-"メモ取り支援
-NeoBundle 'https://github.com/vim-scripts/vimwiki.git'
-runtime! vimrc/vimwiki_rc.vim
-
-
 "日本語サポート
 NeoBundle 'https://github.com/fuenor/JpFormat.vim.git'
 NeoBundle 'https://github.com/fuenor/im_control.vim.git'
@@ -162,6 +162,14 @@ NeoBundle 'https://github.com/vim-scripts/CCTree.git'
 "ウインドウの状態等の保存と復元
 NeoBundle 'https://github.com/osyo-manga/vim-reanimate.git'
 
+" メモ
+NeoBundle 'https://github.com/fuenor/qfixhowm.git'
+runtime! vimrc/qfixhowm_rc.vim
+NeoBundle 'https://github.com/vim-scripts/vimwiki.git'
+runtime! vimrc/vimwiki_rc.vim
+NeoBundle 'https://github.com/Rykka/riv.vim.git'
+NeoBundle 'https://github.com/rcmdnk/vim-markdown.git'
+
 
 NeoBundle 'https://github.com/itchyny/calendar.vim.git'
 NeoBundle 'https://github.com/vim-scripts/trinity.vim.git'
@@ -177,8 +185,8 @@ NeoBundle 'vim-jp/cpp-vim'
 "Unite -auto-preview colorscheme
 NeoBundle 'https://github.com/ujihisa/unite-colorscheme.git'
 NeoBundle 'thinca/vim-qfreplace'
-NeoBundle 'https://github.com/Rykka/riv.vim.git'
 NeoBundle 'https://github.com/Shougo/neomru.vim.git'
+NeoBundle 'https://github.com/Shougo/unite-outline.git'
 runtime! vimrc/misc_rc.vim
 
 

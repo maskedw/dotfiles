@@ -19,7 +19,7 @@ let s:c_include_path = VimPath2CincludePath(&path)
 let g:syntastic_cpp_compiler = "gcc"
 let g:syntastic_c_compiler_options   = s:c_include_path
 let g:syntastic_cpp_compiler = "g++"
-let g:syntastic_cpp_compiler_options = "-std=c++0x " . s:c_include_path
+let g:syntastic_cpp_compiler_options = "-std=c++11 " . s:c_include_path
 let g:default_syntastic_c_compiler_options   = g:syntastic_c_compiler_options
 let g:default_syntastic_cpp_compiler_options = g:syntastic_cpp_compiler_options
 "let g:syntastic_cpp_checkers=['g++']

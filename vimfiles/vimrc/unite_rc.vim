@@ -24,6 +24,15 @@ call unite#custom_default_action('source/bookmark/directory' , 'vimfiler')
 call unite#custom_default_action('vimshell/history' , 'insert')
 call unite#custom_default_action('vimshell/external_history' , 'insert')
 
+"let g:ref_pydoc_cmd="pydoc.py"
+let g:unite_source_grep_encoding='utf8'
+"ptを使用すると文字コードが混在していても文字化けしなかったのが大きな利点。
+if executable('pt')
+  let g:unite_source_grep_command = 'pt'
+  let g:unite_source_grep_default_opts = '--nogroup --nocolor'
+  let g:unite_source_grep_recursive_opt = ''
+endif
+
 augroup Unite
     autocmd!
     " エンターの代わりに以下のキーでウィンドウを水平分割して開く

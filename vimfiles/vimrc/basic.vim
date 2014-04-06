@@ -5,18 +5,6 @@ set t_Co=256
 " 常にカーソル行が画面中央にくるようにする。
 set scrolloff=1000
 "
-" 構文ハイライト有効化
-syntax enable
-if has('vim_starting')
-    filetype off
-    filetype plugin indent off
-    set runtimepath+=~/bundle/neobundle.vim/,~/.vim/after
-    call neobundle#rc(expand('~/bundle/'))
-    filetype on
-    filetype plugin indent on
-endif
-
-
 "============================================================
 "@vimmain プラグインに依存しない設定
 "============================================================
@@ -57,9 +45,17 @@ set ttyfast
 " ファイルの探索パス
 set path&
 if has('win32') || has('win64')
-    set path+=c:/MinGW/include,c:/MinGW/lib/gcc/mingw32/4.8.1/include/c++
+    set path+=c:/MinGW/include
+    set path+=c:/MinGW/lib/gcc/mingw32/4.8.1/include/c++
     set path+=c:/MinGW/lib/gcc/mingw32/4.8.1/include
     set path+=c:/home/src/boost_1_54_0
+    "set path+=c:\mingw\bin\../lib/gcc/mingw32/4.8.1/include/c++
+    "set path+=c:\mingw\bin\../lib/gcc/mingw32/4.8.1/include/c++/mingw32
+    "set path+=c:\mingw\bin\../lib/gcc/mingw32/4.8.1/include/c++/backward
+    "set path+=c:\mingw\bin\../lib/gcc/mingw32/4.8.1/include
+    "set path+=c:\mingw\bin\../lib/gcc/mingw32/4.8.1/../../../../include
+    "set path+=c:\mingw\bin\../lib/gcc/mingw32/4.8.1/include-fixed
+    "set path+=c:\mingw\bin\../lib/gcc/mingw32/4.8.1/../../../../mingw32/include
 else
     set path+=~/local/boost/include
     set path+=/usr/lib/gcc/i686-linux-gnu/4.7/include
