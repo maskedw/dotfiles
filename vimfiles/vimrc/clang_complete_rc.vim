@@ -5,11 +5,9 @@ let g:clang_complete_auto = 0
 let g:clang_auto_select = 0
 let g:clang_use_library = 1
 
-if has('win32')
-    "let g:clang_library_path = "C:/clang/bin"
-    let g:clang_library_path = "C:/Program\ Files\ (x86)/LLVM/bin"
-elseif has('win64')
-    let g:clang_library_path = "C:/Program\ Files\ (x86)/LLVM/bin"
+if has('win32') || has('win64')
+    let g:clang_library_path = "C:/clang/bin"
+    "let g:clang_library_path = "C:/Program\ Files\ (x86)/LLVM/bin"
 else
     let g:clang_library_path = '/usr/lib'
 endif
