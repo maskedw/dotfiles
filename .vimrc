@@ -184,6 +184,7 @@ NeoBundle 'https://bitbucket.org/kh3phr3n/vim-qt-syntax.git'
 NeoBundle 'vim-jp/cpp-vim'
 "Unite -auto-preview colorscheme
 NeoBundle 'https://github.com/ujihisa/unite-colorscheme.git'
+NeoBundle 'https://github.com/tsukkee/unite-tag.git'
 NeoBundle 'thinca/vim-qfreplace'
 NeoBundle 'https://github.com/Shougo/neomru.vim.git'
 NeoBundle 'https://github.com/Shougo/unite-outline.git'

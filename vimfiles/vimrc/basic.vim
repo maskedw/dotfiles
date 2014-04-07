@@ -101,10 +101,10 @@ endfunction
 " なんかここを有効にしていると、:ltag hogeとかするとタグファイルがソートされて
 " いませんとかエラーがでるのでコメントアウト。それでもタグジャンプとかは普通に
 " できる。
-"set tags&
-"if has('path_extra')
-"    set tags+=tags;
-"endif
+set tags&
+if has('path_extra')
+    set tags+=tags;
+endif
 "=== @complete
 "コマンド補完に関する設定
 set wildmode=longest:full,full
