@@ -1,0 +1,42 @@
+%include ~/.hgrc.common
+
+
+[extdiff]
+cmd.windiff = C:\Program Files\WinMerge\WinMergeU.exe
+
+# 画像のdiff
+# http://yanor.net/wiki/?Mercurial/TortoiseHg/%E7%94%BB%E5%83%8F%E3%81%AEdiff
+cmd.diffimg = C:\Program Files\TheHive\DiffImg\diffimg.exe
+
+opts.windiff = /r /e /x /ub
+opts.diffimg =
+
+[merge-tools]
+winmerge.regkey = Software\Thingamahoochie\WinMerge
+winmerge.regname = Executable
+
+
+[ui]
+editor=gvim
+merge = winmergeu
+
+
+[diff-patterns]
+**.bmp = diffimg
+**.jpg = diffimg
+**.gif = diffimg
+**.gif = diffimg
+
+
+[merge-tools]
+winmerge.args = /e /ub /dl other /dr local $other $local $output
+winmerge.fixeol = True
+winmerge.checkchanged = True
+winmerge.gui = True
+
+
+[tortoisehg]
+vdiff = winmergeu
+editor = gvim
+shell = ckw
+tabwidth = 4

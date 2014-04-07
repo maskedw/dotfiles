@@ -158,9 +158,10 @@ set nopaste
 set backup
 "スワップファイルを使用しない
 set noswapfile
-set viewdir=~/.vimview
-set backupdir=~/vim_backup
-set directory=~/vim_swap
+set viewdir=~/vim.d/view
+set backupdir=~/vim.d/backup
+set directory=~/vim.d/swap
+set undodir=~/vim.d/undo/
 
 " 何故かこのオプションを有効にすると、neocomplcacheが異常に重くなる。
 "@@@set viminfo=%,'50,/50,:50,<50,@50,h,f1,n~/.viminfo

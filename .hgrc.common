@@ -1,0 +1,12 @@
+[extensions]
+largefiles =
+progress =
+extdiff =
+hgext.convert =
+
+[largefiles]
+minsize = 5
+#patterns = *.jpg
+#patterns =
+#   *.jpg
+#   *.bmp

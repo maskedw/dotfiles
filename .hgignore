@@ -1,0 +1,4 @@
+syntax: regexp
+
+.*\.local.vimrc
+.*\.orig

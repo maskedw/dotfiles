@@ -13,8 +13,10 @@ endif
 if has('vim_starting')
     filetype off
     filetype plugin indent off
-    set runtimepath+=~/bundle/neobundle.vim/,~/.vim/after
-    call neobundle#rc(expand('~/bundle/'))
+    "set runtimepath+=~/bundle/neobundle.vim/,~/.vim/after
+    "call neobundle#rc(expand('~/bundle/'))
+    set runtimepath+=~/vim.d/bundle/neobundle.vim/,~/.vim/after
+    call neobundle#rc(expand('~/vim.d/bundle/'))
     filetype on
     filetype plugin indent on
 endif
