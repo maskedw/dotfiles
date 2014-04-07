@@ -6,15 +6,13 @@ if has('win32') || has('win64')
     set runtimepath+=~/vimfiles/
     set fileformat=dos
 else
-    set runtimepath+=~/.vim
+    set runtimepath+=~/.vim/
     set fileformat=unix
 endif
 
 if has('vim_starting')
     filetype off
     filetype plugin indent off
-    "set runtimepath+=~/bundle/neobundle.vim/,~/.vim/after
-    "call neobundle#rc(expand('~/bundle/'))
     set runtimepath+=~/vim.d/bundle/neobundle.vim/,~/.vim/after
     call neobundle#rc(expand('~/vim.d/bundle/'))
     filetype on
