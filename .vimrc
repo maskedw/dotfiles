@@ -92,6 +92,7 @@ NeoBundle 'kannokanno/previm'
 NeoBundle 'vim-voom/VOoM'
 NeoBundle 'tyru/open-browser.vim'
 NeoBundle 'tyru/open-browser-github.vim'
+NeoBundle 'junegunn/vim-easy-align'
 
 " utility
 NeoBundle 'scrooloose/syntastic'
@@ -319,7 +320,9 @@ set expandtab
 " ウインドウに収まらない行は折り返して表示する。
 set wrap           " the longer line is wrapped
 set linebreak      " wrap at 'breakat'
-"set breakat=\      " break point for linebreak (default " ^I!@*-+;:,./?")
+" set breakat=\      " break point for linebreak (default " ^I!@*-+;:,./?")
+set breakat-=-
+set breakat-=.
 set showbreak=+\   " set showbreak
 if (v:version == 704 && has("patch338")) || v:version >= 705
   set breakindent    " indent even for wrapped lines
@@ -1629,6 +1632,17 @@ if ! empty(neobundle#get('qfixhowm'))
     " MRU登録用の正規表現(Vim)を指定
     let g:QFixMRU_Title['mkd'] = '^#[^#]'
 
+    let qfixmemo_timeformat       = '<!-- %Y-%m-%d %H:%M -->'
+
+    " qfixmemo#UpdateTime()でタイムスタンプの置換に使用する正規表現(Vim)
+    let qfixmemo_timeformat_regxp = '<!-- \d\{4}-\d\{2}-\d\{2} \d\{2}:\d\{2} -->'
+
+    " タイムスタンプ行とみなす正規表現(Vim)
+    let qfixmemo_timestamp_regxp  = qfixmemo_timeformat_regxp
+
+    " qfixmemo#AddTitle()で擬似タイトル行とみなす正規表現(Vim)
+    let qfixmemo_alt_title_regxp  = ''
+
     " NOTE:
     " 外部grepと内部で使うVimの正規表現が異なる場合は、更にgrep専用の正規表現を設定
     " 可能です。
@@ -1829,11 +1843,12 @@ let g:tagbar_autopreview = 1
 hi htmlH1 guifg=#F2D8DF gui=bold
 " オレンジ
 hi htmlH2 guifg=#EF7585 gui=bold
-" 薄い青
-hi htmlH3 guifg=#00FFFF gui=bold
-" 黄色
-hi htmlH4 guifg=#FFFF00 gui=bold
 " 薄いピンク
-hi htmlH5 guifg=#EFC1C4 gui=bold
+hi htmlH3 guifg=#EFC1C4 gui=bold
+" 黄色
+" hi htmlH4 guifg=#FFFF00 gui=bold
+hi htmlH4 guifg=#F2D8DF gui=bold
+" 薄い青
+hi htmlH5 guifg=#00FF00  gui=bold
 " 緑
 hi htmlH6 guifg=#00FF00 gui=bold

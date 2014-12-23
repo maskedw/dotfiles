@@ -42,28 +42,11 @@ endif
 hi htmlH1 guifg=#F2D8DF gui=bold
 " オレンジ
 hi htmlH2 guifg=#EF7585 gui=bold
-" 薄い青
-hi htmlH3 guifg=#00FFFF gui=bold
+" 薄いピンク
+hi htmlH3 guifg=#EFC1C4 gui=bold
 " 黄色
 hi htmlH4 guifg=#FFFF00 gui=bold
-" 薄いピンク
-hi htmlH5 guifg=#EFC1C4 gui=bold
+" 薄い青
+hi htmlH5 guifg=#00FF00  gui=bold
 " 緑
 hi htmlH6 guifg=#00FF00 gui=bold
-
-" " ピンク
-" hi VimwikiHeader1 guifg=Violet gui=bold
-" " オレンジ
-" hi VimwikiHeader2 guifg=#EF7585 gui=bold
-" " 薄い青
-" hi VimwikiHeader3 guifg=#00FFFF gui=bold
-" " 黄色
-" hi VimwikiHeader4 guifg=#FFFF00 gui=bold
-" " 薄いピンク
-" hi VimwikiHeader5 guifg=#EFC1C4 gui=bold
-" " 緑
-" hi VimwikiHeader6 guifg=#00FF00 gui=bold
-"
-" hi VimwikiItalicBold guifg=Orange gui=bold
-" hi VimwikiBoldItalic guifg=Orange gui=bold
-" hi VimwikiBold guifg=LightGreen gui=bold
