@@ -38,5 +38,3 @@ core.[0-9]*
 *.elf
 *.lss
 *.srec
-
-

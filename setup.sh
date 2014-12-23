@@ -21,15 +21,6 @@ set -o nounset                              # Treat unset variables as an error
 PWD=`pwd`
 echo $PWD
 
-echo "Create vim directory..."
-TARGET="backup swap view undo bundle"
-for dir in $TARGET ; do
-    if [ ! -d ~/vim.d/$dir ] ; then
-        mkdir ~/vim.d/$dir
-    fi
-done
-
-echo "Linking dotfiles..."
 TARGET=".vimrc .gvimrc .vsvimrc "
 TARGET+=".gdbinit .ctags .gitignore .gitconfig.common"
 for f in $TARGET ; do

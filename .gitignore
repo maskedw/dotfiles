@@ -20,7 +20,6 @@
 ## mapfile
 *.map
 # Documets
-[Dd]oc/*
 [Dd]oxygen/*
 [Dd]oxygen_output/*
 */[Dd]oxygen_output/*

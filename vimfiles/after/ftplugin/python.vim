@@ -1,2 +1,2 @@
-setlocal textwidth=70
+setlocal textwidth=80
 setlocal fileencoding=utf-8

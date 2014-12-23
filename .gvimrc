@@ -1,18 +1,13 @@
 syntax enable
 colorscheme hybrid
-"colorscheme desert
-"colorscheme DarkDefault
-"colorscheme wombat
-"set background=dark
-"hi Visual gui=none guifg=khaki guibg=olivedrab
 
-"set background=light
-"colorscheme solarized
 if has('win32') || has('win64')
     "set guifont=MeiryoKe_Console:h10.5:cSHIFTJIS
     "set guifontwide=MeiryoKe_Console:h10.5:cSHIFTJIS
-    set guifont=Consolas:h11:cSHIFTJIS
-    set guifontwide=Consolas:h11:cSHIFTJIS
+    " set guifont=Consolas:h10.5:cSHIFTJIS
+    " set guifontwide=Consolas:h10.5:cSHIFTJIS
+    set guifont=Consolas:h11.5:cSHIFTJIS
+    set guifontwide=Consolas:h11.5:cSHIFTJIS
 
 "起動時に最大化
     au GUIEnter * simalt ~x
@@ -27,34 +22,48 @@ else
     set colorcolumn=0
 endif
 
-"コマンドラインの高さ
-set cmdheight=2
+set cmdheight=3
 
-set textwidth=70
-autocmd BufRead *vimrc setlocal textwidth=0
-"highlight colorcolumn guifg=NONE guibg=gray24
+set wrap           " the longer line is wrapped
+set linebreak      " wrap at 'breakat'
+"set breakat=\      " break point for linebreak (default " ^I!@*-+;:,./?")
+set showbreak=+\   " set showbreak
+"コマンドラインの高さ
+if (v:version == 704 && has("patch338")) || v:version >= 705
+  set breakindent    " indent even for wrapped lines
+endif
 
 if has('multi_byte_ime')
   highlight Cursor guifg=NONE guibg=Green
   highlight CursorIM guifg=NONE guibg=Purple
 endif
 
-let g:Powerline_symbols = 'compatible'
-
-
 " ピンク
-hi VimwikiHeader1 guifg=Violet gui=bold
+hi htmlH1 guifg=#F2D8DF gui=bold
 " オレンジ
-hi VimwikiHeader2 guifg=#EF7585 gui=bold
+hi htmlH2 guifg=#EF7585 gui=bold
 " 薄い青
-hi VimwikiHeader3 guifg=#00FFFF gui=bold
+hi htmlH3 guifg=#00FFFF gui=bold
 " 黄色
-hi VimwikiHeader4 guifg=#FFFF00 gui=bold
+hi htmlH4 guifg=#FFFF00 gui=bold
 " 薄いピンク
-hi VimwikiHeader5 guifg=#EFC1C4 gui=bold
+hi htmlH5 guifg=#EFC1C4 gui=bold
 " 緑
-hi VimwikiHeader6 guifg=#00FF00 gui=bold
+hi htmlH6 guifg=#00FF00 gui=bold
 
-hi VimwikiItalicBold guifg=Orange gui=bold
-hi VimwikiBoldItalic guifg=Orange gui=bold
-hi VimwikiBold guifg=LightGreen gui=bold
+" " ピンク
+" hi VimwikiHeader1 guifg=Violet gui=bold
+" " オレンジ
+" hi VimwikiHeader2 guifg=#EF7585 gui=bold
+" " 薄い青
+" hi VimwikiHeader3 guifg=#00FFFF gui=bold
+" " 黄色
+" hi VimwikiHeader4 guifg=#FFFF00 gui=bold
+" " 薄いピンク
+" hi VimwikiHeader5 guifg=#EFC1C4 gui=bold
+" " 緑
+" hi VimwikiHeader6 guifg=#00FF00 gui=bold
+"
+" hi VimwikiItalicBold guifg=Orange gui=bold
+" hi VimwikiBoldItalic guifg=Orange gui=bold
+" hi VimwikiBold guifg=LightGreen gui=bold
