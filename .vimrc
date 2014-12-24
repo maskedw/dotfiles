@@ -942,7 +942,7 @@ Autocmd WinLeave * set nocursorline
 Autocmd CmdwinEnter * call s:InitCmdWin()
 " git commit message のときは折りたたまない(diff で中途半端な折りたたみになりがち)
 " git commit message のときはスペルをチェックする
-AutocmdFT gitcommit setlocal nofoldenable spell
+AutocmdFT gitcommit setlocal nofoldenable spell | set fileencoding=utf-8
 AutocmdFT diff setlocal nofoldenable
 AutocmdFT c      setlocal omnifunc=ccomplete#Complete
 AutocmdFT cpp      setlocal omnifunc=ccomplete#Complete
@@ -1581,7 +1581,7 @@ if ! empty(neobundle#get('qfixhowm'))
     " QFixHowmとのオプションコンバートを行う or 行わない
     let g:QFixHowm_Convert = 1
     " メモファイルの保存先
-    let g:qfixmemo_dir           = '~/qfixmemo'
+    let g:qfixmemo_dir           = '~/Dropbox/qfixmemo'
 
     let g:qfixmemo_title    = '#'
     " メモファイルのファイル名
