@@ -208,6 +208,7 @@ NeoBundleLazy 'cohama/agit.vim', {
 NeoBundleLazy 'Rip-Rip/clang_complete', {
     \ 'autoload' : {'filetypes' : ['c', 'cpp']}
     \ }
+" NeoBundle 'Rip-Rip/clang_complete'
 
 " Python
 " NeoBundle 'davidhalter/jedi-vim'
@@ -290,12 +291,12 @@ if has('win32') || has('win64')
     set path+=c:/mingw/bin/../lib/gcc/mingw32/4.8.1/../../../../mingw32/include
 else
     set path+=~/local/boost/include
-    set path+=/usr/lib/gcc/i686-linux-gnu/4.7/include
+    set path+=/usr/lib/gcc/i686-linux-gnu/4.8/include
     set path+=/usr/local/include
-    set path+=/usr/lib/gcc/i686-linux-gnu/4.7/include-fixed
+    set path+=/usr/lib/gcc/i686-linux-gnu/4.8/include-fixed
     set path+=/usr/include/i386-linux-gnu
     set path+=/usr/include
-    set path+=/usr/include/c++/4.7
+    set path+=/usr/include/c++/4.8
 endif
 let g:default_path = &path
 
@@ -718,6 +719,7 @@ endif
 " FUNCTIONS:
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 function! SourceIfExist(path)
+    " echo a:path
     if filereadable(a:path)
         execute 'source' a:path
     endif
@@ -729,6 +731,51 @@ function! VimPath2CincludePath(path)
     let cpath = substitute(cpath, "\\", "", "g")
     let cpath = substitute(cpath, "^.", "", "")
     return cpath
+endfunction
+
+function! UpdatePath()
+    let s:cpath = VimPath2CincludePath(&path)
+    let s:copt = '-std=c99 ' . s:cpath
+    let s:cppopt = '-std=c++11 ' . s:cpath
+    let s:strict_copt = '-Wall -Wextra ' . s:copt
+    let s:strict_cppopt = '-Wall -Wextra ' . s:cppopt
+
+    if ! empty(neobundle#get('syntastic'))
+        let g:syntastic_c_compiler_options   = s:strict_copt
+        let g:syntastic_cpp_compiler_options = s:strict_cppopt
+    endif
+
+    if ! empty(neobundle#get('neocomplete.vim'))
+        let g:neocomplete#sources#include#paths = {
+                \ 'cpp' :   &path,
+                \ 'c'   :   &path,
+                \ }
+    endif
+
+    if ! empty(neobundle#get('clang_complete'))
+        let g:clang_user_options = s:strict_cppopt
+    endif
+
+    if ! empty(neobundle#get('vim-quickrun'))
+        let g:quickrun_config.c = {
+                    \ 'command' : 'gcc',
+                    \ 'cmdopt' : s:copt . ' -O2',
+                    \ 'tempfile': '%{tempname()}.c',
+                    \ 'exec': ['%c %o %s -o %s:p:r', '%s:p:r %a'],
+                    \ 'hook/quickrunex/enable' : 1,
+                    \ 'hook/sweep/files': '%S:p:r',
+                    \ 'hook/add_include_option/enable' : 1,
+                    \ }
+        let g:quickrun_config.cpp = {
+                    \ 'command' : 'g++',
+                    \ 'cmdopt' : s:cppopt . ' -O2',
+                    \ 'tempfile': '%{tempname()}.cpp',
+                    \ 'exec': ['%c %o %s -o %s:p:r', '%s:p:r %a'],
+                    \ 'hook/quickrunex/enable' : 1,
+                    \ 'hook/sweep/files': '%S:p:r',
+                    \ 'hook/add_include_option/enable' : 1,
+                    \ }
+    endif
 endfunction
 
 function! s:InitCmdWin()
@@ -819,14 +866,35 @@ function! ToggleNumberOption()
     endif
 endfunction
 
+
+function! s:is_git_dir()
+    return system('git rev-parse --is-inside-work-tree') ==# "true\n"
+endfunction
+
 " git のルートディレクトリを返す
-function! s:git_root_dir()
-    if(system('git rev-parse --is-inside-work-tree') ==# "true\n")
-        return system('git rev-parse --show-cdup')
+function! GitRootDir()
+    if(<SID>is_git_dir())
+        let gitdir = system('git rev-parse --show-toplevel')
+        let l:gitdir= substitute(l:gitdir, '\r\n', '', 'g')
+        let l:gitdir= substitute(l:gitdir, '\n', '', 'g')
+        return l:gitdir
     else
         echoerr 'current directory is outside git working tree'
     endif
 endfunction
+
+
+" git のルートディレクトリを返す
+" function! s:GitRootDir()
+"     if(system('git rev-parse --is-inside-work-tree') ==# "true\n")
+"         let gitdir = system('git rev-parse --show-toplevel')
+"         let l:gitdir= substitute(l:gitdir, '\r\n', '', 'g')
+"         let l:gitdir= substitute(l:gitdir, '\n', '', 'g')
+"         return l:gitdir
+"     else
+"         echoerr 'current directory is outside git working tree'
+"     endif
+" endfunction
 
 function! s:add_permission_x()
     let file = expand('%:p')
@@ -957,16 +1025,10 @@ endif
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " PLUGIN_SETTINGS:
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-let s:cpath = VimPath2CincludePath(&path)
-let s:copt = '-std=c99 ' . s:cpath
-let s:cppopt = '-std=c++11 ' . s:cpath
-let s:strict_copt = '-Wall -Wextra ' . s:copt
-let s:strict_cppopt = '-Wall -Wextra ' . s:cppopt
-
 if ! empty(neobundle#get('unite.vim'))
     " uniteの説明については以下リンク先が詳しい。
     " http://komaken.me/blog/2014/05/07/%E3%81%84%E3%81%A4%E3%81%BE%E3%81%A7%E3%81%9F%E3%81%A3%E3%81%A6%E3%82%82unite-vim%E3%81%8C%E4%BD%BF%E3%81%84%E3%81%93%E3%81%AA%E3%81%9B%E3%81%AA%E3%81%84%E3%81%AE%E3%81%A7%E3%80%81%E3%81%95%E3%81%99/
-    let g:unite_enable_start_insert=0
+    let g:unite_enable_start_insert=1
     let g:unite_enable_split_vertically=1
     let g:unit_file_mru_limit=1000
     let g:unite_kind_file_use_trashbox = 1
@@ -993,11 +1055,12 @@ if ! empty(neobundle#get('unite.vim'))
     " nnoremap <silent>[unite]o       :<C-u>Unite outline -vertical -no-start-insert -auto-preview -no-quit<CR>
     nnoremap <silent>[unite]o       :<C-u>Unite outline -vertical -no-start-insert -auto-preview<CR>
     " コマンドの出力
-    nnoremap <silent>[unite]c       :<C-u>Unite output<CR>
+    nnoremap <silent>[unite]O       :<C-u>Unite output<CR>
+    nnoremap <silent>[unite]c       :<C-u>Unite codic<CR>
     " grep検索．
     nnoremap <silent>[unite]g       :<C-u>Unite -no-start-insert grep -auto-preview<CR>
     " Git のルートディレクトリを開く
-    nnoremap <silent><expr>[unite]G  ":\<C-u>Unite file -input=".fnamemodify(<SID>git_root_dir(),":p")
+    nnoremap <silent><expr>[unite]G  ":\<C-u>Unite file -input=".fnamemodify(GitRootDir(),":p")
     " Uniteバッファの復元
     nnoremap <silent>[unite]r       :<C-u>UniteResume<CR>
     " Unite ソース一覧
@@ -1031,6 +1094,211 @@ if ! empty(neobundle#get('unite.vim'))
     AutocmdFT unite inoremap <silent> <buffer> <expr> <C-V> unite#do_action('vsplit')
 endif
 
+"@============================================================
+	" " Note: This option must set it in .vimrc(_vimrc).
+	" " NOT IN .gvimrc(_gvimrc)!
+	" " Disable AutoComplPop.
+	" let g:acp_enableAtStartup = 0
+	" " Use neocomplete.
+	" let g:neocomplete#enable_at_startup = 1
+	" " Use smartcase.
+	" let g:neocomplete#enable_smart_case = 1
+	" " Set minimum syntax keyword length.
+	" let g:neocomplete#sources#syntax#min_keyword_length = 3
+	" let g:neocomplete#lock_buffer_name_pattern = '\*ku\*'
+
+	" " Define dictionary.
+	" let g:neocomplete#sources#dictionary#dictionaries = {
+	"     \ 'default' : '',
+	"     \ 'vimshell' : $HOME.'/.vimshell_hist',
+	"     \ 'scheme' : $HOME.'/.gosh_completions'
+	"     \ }
+
+	" " Define keyword.
+	" if !exists('g:neocomplete#keyword_patterns')
+	"     let g:neocomplete#keyword_patterns = {}
+	" endif
+	" let g:neocomplete#keyword_patterns['default'] = '\h\w*'
+
+	" " Plugin key-mappings.
+	" inoremap <expr><C-g>     neocomplete#undo_completion()
+	" inoremap <expr><C-l>     neocomplete#complete_common_string()
+
+	" " Recommended key-mappings.
+	" " <CR>: close popup and save indent.
+	" inoremap <silent> <CR> <C-r>=<SID>my_cr_function()<CR>
+	" function! s:my_cr_function()
+	"   return neocomplete#close_popup() . "\<CR>"
+	"   " For no inserting <CR> key.
+	"   "return pumvisible() ? neocomplete#close_popup() : "\<CR>"
+	" endfunction
+	" " <TAB>: completion.
+	" inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
+	" " <C-h>, <BS>: close popup and delete backword char.
+	" inoremap <expr><C-h> neocomplete#smart_close_popup()."\<C-h>"
+	" inoremap <expr><BS> neocomplete#smart_close_popup()."\<C-h>"
+	" inoremap <expr><C-y>  neocomplete#close_popup()
+	" inoremap <expr><C-e>  neocomplete#cancel_popup()
+	" " Close popup by <Space>.
+	" "inoremap <expr><Space> pumvisible() ? neocomplete#close_popup() : "\<Space>"
+
+	" " For cursor moving in insert mode(Not recommended)
+	" "inoremap <expr><Left>  neocomplete#close_popup() . "\<Left>"
+	" "inoremap <expr><Right> neocomplete#close_popup() . "\<Right>"
+	" "inoremap <expr><Up>    neocomplete#close_popup() . "\<Up>"
+	" "inoremap <expr><Down>  neocomplete#close_popup() . "\<Down>"
+	" " Or set this.
+	" "let g:neocomplete#enable_cursor_hold_i = 1
+	" " Or set this.
+	" "let g:neocomplete#enable_insert_char_pre = 1
+
+	" " AutoComplPop like behavior.
+	" "let g:neocomplete#enable_auto_select = 1
+
+	" " Shell like behavior(not recommended).
+	" "set completeopt+=longest
+	" "let g:neocomplete#enable_auto_select = 1
+	" "let g:neocomplete#disable_auto_complete = 1
+	" "inoremap <expr><TAB>  pumvisible() ? "\<Down>" :
+	" " \ neocomplete#start_manual_complete()
+
+	" " Enable omni completion.
+	" autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
+	" autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
+	" autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
+	" autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
+	" autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
+
+	" " Enable heavy omni completion.
+	" if !exists('g:neocomplete#sources#omni#input_patterns')
+	"   let g:neocomplete#sources#omni#input_patterns = {}
+	" endif
+	" if !exists('g:neocomplete#force_omni_input_patterns')
+	"   let g:neocomplete#force_omni_input_patterns = {}
+	" endif
+	" "let g:neocomplete#sources#omni#input_patterns.php =
+	" "\ '[^. \t]->\%(\h\w*\)\?\|\h\w*::\%(\h\w*\)\?'
+	" "let g:neocomplete#sources#omni#input_patterns.c =
+	" "\ '[^.[:digit:] *\t]\%(\.\|->\)\%(\h\w*\)\?'
+	" "let g:neocomplete#sources#omni#input_patterns.cpp =
+	" "\ '[^.[:digit:] *\t]\%(\.\|->\)\%(\h\w*\)\?\|\h\w*::\%(\h\w*\)\?'
+
+	" " For perlomni.vim setting.
+	" " https://github.com/c9s/perlomni.vim
+	" let g:neocomplete#sources#omni#input_patterns.perl =
+	" \ '[^. \t]->\%(\h\w*\)\?\|\h\w*::\%(\h\w*\)\?'
+
+	" " For smart TAB completion.
+	" "inoremap <expr><TAB>  pumvisible() ? "\<C-n>" :
+	" "        \ <SID>check_back_space() ? "\<TAB>" :
+	" "        \ neocomplete#start_manual_complete()
+	" "  function! s:check_back_space() "{{{
+	" "    let col = col('.') - 1
+	" "    return !col || getline('.')[col - 1]  =~ '\s'
+	" "  endfunction"}}}
+
+	" " " Note: This option must set it in .vimrc(_vimrc).
+	" " " NOT IN .gvimrc(_gvimrc)!
+	" " " Disable AutoComplPop.
+	" " let g:acp_enableAtStartup = 0
+	" " " Use neocomplete.
+	" " let g:neocomplete#enable_at_startup = 1
+	" " " Use smartcase.
+	" " let g:neocomplete#enable_smart_case = 1
+	" " " Set minimum syntax keyword length.
+	" " let g:neocomplete#sources#syntax#min_keyword_length = 3
+	" " let g:neocomplete#lock_buffer_name_pattern = '\*ku\*'
+
+	" " " Define dictionary.
+	" " let g:neocomplete#sources#dictionary#dictionaries = {
+	" "     \ 'default' : '',
+	" "     \ 'vimshell' : $HOME.'/.vimshell_hist',
+	" "     \ 'scheme' : $HOME.'/.gosh_completions'
+	" "     \ }
+
+	" " " Define keyword.
+	" " if !exists('g:neocomplete#keyword_patterns')
+	" "     let g:neocomplete#keyword_patterns = {}
+	" " endif
+	" " let g:neocomplete#keyword_patterns['default'] = '\h\w*'
+
+	" " " Plugin key-mappings.
+	" " inoremap <expr><C-g>     neocomplete#undo_completion()
+	" " inoremap <expr><C-l>     neocomplete#complete_common_string()
+
+	" " " Recommended key-mappings.
+	" " " <CR>: close popup and save indent.
+	" " inoremap <silent> <CR> <C-r>=<SID>my_cr_function()<CR>
+	" " function! s:my_cr_function()
+	" "   return neocomplete#close_popup() . "\<CR>"
+	" "   " For no inserting <CR> key.
+	" "   "return pumvisible() ? neocomplete#close_popup() : "\<CR>"
+	" " endfunction
+	" " " <TAB>: completion.
+	" " inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
+	" " " <C-h>, <BS>: close popup and delete backword char.
+	" " inoremap <expr><C-h> neocomplete#smart_close_popup()."\<C-h>"
+	" " inoremap <expr><BS> neocomplete#smart_close_popup()."\<C-h>"
+	" " inoremap <expr><C-y>  neocomplete#close_popup()
+	" " inoremap <expr><C-e>  neocomplete#cancel_popup()
+	" " " Close popup by <Space>.
+	" " "inoremap <expr><Space> pumvisible() ? neocomplete#close_popup() : "\<Space>"
+
+	" " " For cursor moving in insert mode(Not recommended)
+	" " "inoremap <expr><Left>  neocomplete#close_popup() . "\<Left>"
+	" " "inoremap <expr><Right> neocomplete#close_popup() . "\<Right>"
+	" " "inoremap <expr><Up>    neocomplete#close_popup() . "\<Up>"
+	" " "inoremap <expr><Down>  neocomplete#close_popup() . "\<Down>"
+	" " " Or set this.
+	" " "let g:neocomplete#enable_cursor_hold_i = 1
+	" " " Or set this.
+	" " "let g:neocomplete#enable_insert_char_pre = 1
+
+	" " " AutoComplPop like behavior.
+	" " "let g:neocomplete#enable_auto_select = 1
+
+	" " " Shell like behavior(not recommended).
+	" " "set completeopt+=longest
+	" " "let g:neocomplete#enable_auto_select = 1
+	" " "let g:neocomplete#disable_auto_complete = 1
+	" " "inoremap <expr><TAB>  pumvisible() ? "\<Down>" :
+	" " " \ neocomplete#start_manual_complete()
+
+	" " " Enable omni completion.
+	" " autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
+	" " autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
+	" " autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
+	" " autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
+	" " autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
+
+	" " " Enable heavy omni completion.
+	" " if !exists('g:neocomplete#sources#omni#input_patterns')
+	" "   let g:neocomplete#sources#omni#input_patterns = {}
+	" " endif
+	" " if !exists('g:neocomplete#force_omni_input_patterns')
+	" "   let g:neocomplete#force_omni_input_patterns = {}
+	" " endif
+	" " "let g:neocomplete#sources#omni#input_patterns.php =
+	" " "\ '[^. \t]->\%(\h\w*\)\?\|\h\w*::\%(\h\w*\)\?'
+	" " "let g:neocomplete#sources#omni#input_patterns.c =
+	" " "\ '[^.[:digit:] *\t]\%(\.\|->\)\%(\h\w*\)\?'
+	" " "let g:neocomplete#sources#omni#input_patterns.cpp =
+	" " "\ '[^.[:digit:] *\t]\%(\.\|->\)\%(\h\w*\)\?\|\h\w*::\%(\h\w*\)\?'
+
+	" " " For perlomni.vim setting.
+	" " " https://github.com/c9s/perlomni.vim
+	" " let g:neocomplete#sources#omni#input_patterns.perl =
+	" " \ '[^. \t]->\%(\h\w*\)\?\|\h\w*::\%(\h\w*\)\?'
+
+	" " " For smart TAB completion.
+	" " "inoremap <expr><TAB>  pumvisible() ? "\<C-n>" :
+	" " "        \ <SID>check_back_space() ? "\<TAB>" :
+	" " "        \ neocomplete#start_manual_complete()
+	" " "  function! s:check_back_space() "{{{
+	" " "    let col = col('.') - 1
+	" " "    return !col || getline('.')[col - 1]  =~ '\s'
+	" " "  endfunction"}}}
+"@============================================================
 if ! empty(neobundle#get('neocomplete.vim'))
 
     " For snippet_complete marker.
@@ -1061,7 +1329,8 @@ if ! empty(neobundle#get('neocomplete.vim'))
     ""現在選択している候補をキャンセルし、ポップアップを閉じる
 	"inoremap <expr><C-e>  neocomplete#cancel_popup()
 	" Close popup by <Space>.
-	inoremap <expr><Space> pumvisible() ? neocomplete#close_popup() : "\<Space>"
+	" inoremap <expr><Space> pumvisible() ? neocomplete#close_popup() : "\<Space>"
+	inoremap <expr><Space> pumvisible() ? neocomplete#close_popup()."\<Space>" : "\<Space>"
 
 	" Enable omni completion.
 	AutocmdFT css setlocal omnifunc=csscomplete#CompleteCSS
@@ -1082,11 +1351,11 @@ if ! empty(neobundle#get('neocomplete.vim'))
     " デリミタ（autoload 関数の # など）の自動挿入
     let g:neocomplete#enable_auto_delimiter = 1
     "シンタックスをキャッシュするときの最小文字長を4に
-    let g:neocomplete#min_keyword_length = 3
     let g:neocomplete#sources#syntax#min_keyword_length = 3
     "補完を開始する入力文字長
-    let g:neocomplete#auto_completion_start_length = 1
-	let g:neocomplete#enable_cursor_hold_i = 1
+    let g:neocomplete#auto_completion_start_length = 2
+    " これを設定していると、曖昧補間が効かなくなってしまった。
+	" let g:neocomplete#enable_cursor_hold_i = 1
 	" AutoComplPop like behavior.
 	"let g:neocomplete#enable_auto_select = 1
     "日本語を収集しないようにする
@@ -1095,7 +1364,7 @@ if ! empty(neobundle#get('neocomplete.vim'))
     endif
     let g:neocomplete#keyword_patterns['default'] = '\h\w*'
     "リスト表示
-    let g:neocomplete#max_list = 300
+    let g:neocomplete#max_list = 2000
     " 辞書定義
     let g:neocomplete#sources#dictionary#dictionaries = {
                 \ 'default' : '',
@@ -1107,11 +1376,6 @@ if ! empty(neobundle#get('neocomplete.vim'))
     endif
     let g:neocomplete#delimiter_patterns.vim = ['#']
     let g:neocomplete#delimiter_patterns.cpp = ['::']
-    let g:neocomplete#sources#include#paths = {
-            \ 'cpp' :   &path,
-            \ 'c'   :   &path,
-            \ }
-
     let g:neocomplete#sources#include#patterns = {
         \ 'cpp' : '^\s*#\s*include',
         \ 'c' : '^\s*#\s*include',
@@ -1136,11 +1400,14 @@ if ! empty(neobundle#get('neocomplete.vim'))
     " 現在のSourceの取得は `:echo keys(neocomplete#variables#get_sources())`
     " デフォルト: ['file', 'tag', 'neosnippet', 'vim', 'dictionary', 'omni', 'member', 'syntax', 'include', 'buffer', 'file/include']
     " let g:neocomplete#sources = {
-    "   \ '_' : ['file', 'neosnippet', 'syntax', 'member', 'omni', 'include', 'vim', 'buffer', 'file/include']
+    "   \ '_' : ['file', 'file/include', 'neosnippet', 'syntax', 'member', 'omni', 'include', 'tag', 'vim', 'buffer']
     "   \ }
-    let g:neocomplete#sources = {
-      \ '_' : ['file', 'file/include', 'neosnippet', 'syntax', 'member', 'omni', 'vim', 'buffer']
-      \ }
+    " let g:neocomplete#sources = {
+    "   \ '_' : ['file', 'file/include', 'neosnippet', 'syntax', 'member', 'omni', 'vim', 'buffer']
+    "   \ }
+    " let g:neocomplete#sources = {
+    "   \ '_' : ['file', 'file/include', 'neosnippet', 'syntax', 'member', 'include', 'omni', 'vim', 'buffer']
+    "   \ }
 
     " neocomplete 補完用関数
     let g:neocomplete#sources#vim#complete_functions = {
@@ -1165,8 +1432,9 @@ if ! empty(neobundle#get('clang_complete'))
         let g:clang_library_path = '/usr/lib'
     endif
 
-    let g:clang_user_options      = '-std=c++11'
-    let g:clang_auto_user_options ='path, .clang_complete'
+    " let g:clang_user_options      = '-std=c++11'
+    " let g:clang_auto_user_options ='path, .clang_complete'
+    let g:clang_auto_user_options =''
     let g:clang_snippets = 1
     let g:clang_snippets_engine = 'clang_complete'
     let g:clang_trailing_placeholder = 1
@@ -1242,9 +1510,9 @@ if ! empty(neobundle#get('vimfiler.vim'))
     " vimfilerをexploler風に開く
     nnoremap [vimfiler]e        :<C-u>VimFilerExplorer<CR>
     " .gitのあるディレクトリを開く。
-    nnoremap <silent><expr>[vimfiler]g ":\<C-u>VimFiler " . <SID>git_root_dir() . '\<CR>'
+    nnoremap <silent><expr>[vimfiler]g ":\<C-u>VimFiler " . <SID>GitRootDir() . '\<CR>'
     " .gitのあるディレクトリをexploer風に開く。
-    nnoremap <silent><expr>[vimfiler]<S-g> ":\<C-u>VimFilerExplorer " . <SID>git_root_dir() . '\<CR>'
+    nnoremap <silent><expr>[vimfiler]<S-g> ":\<C-u>VimFilerExplorer " . <SID>GitRootDir() . '\<CR>'
 
     let g:vimfiler_as_default_explorer = 1
     let g:vimfiler_safe_mode_by_default = 0
@@ -1300,7 +1568,8 @@ if ! empty(neobundle#get('ctrlp.vim'))
     let g:ctrlp_mruf_max            = 500 " MRUの最大記録数
     let g:ctrlp_custom_ignore = {
         \ 'dir':  '\v[\/]\.(git|hg|svn|neocon|neocomplcache|neocomplete|cache)$',
-        \ 'file': '\v\.(mp3|mp4|jpg|png|pdf|zip|m4a|pkg|gz|ttf|mov|avi|dmg|rar|xls|mobi)$',
+        \ 'file': '\v\.(mp3|mp4|bmp|jpg|png|pdf|zip|m4a|pkg|gz|'.
+        \               'o|obj|a|exe|dll|so|swp|ttf|mov|avi|dmg|rar|xls|mobi)$',
         \ }
 endif
 
@@ -1387,12 +1656,9 @@ if ! empty(neobundle#get('syntastic'))
     let g:syntastic_echo_current_error = 1
     let g:syntastic_check_on_open = 0
     let g:syntastic_loc_list_height = 5
-    let s:cpath = VimPath2CincludePath(&path)
     let g:syntastic_c_compiler = "gcc"
-    let g:syntastic_c_compiler_options   = s:strict_copt
     let g:syntastic_c_check_header = 1
     let g:syntastic_cpp_compiler = "g++"
-    let g:syntastic_cpp_compiler_options = s:strict_cppopt
     let g:syntastic_cpp_check_header = 1
     let g:syntastic_python_python_exe = 'python3'
     let g:syntastic_python_checkers=['flake8']
@@ -1420,24 +1686,6 @@ if ! empty(neobundle#get('vim-quickrun'))
                 \ 'runner/vimproc/updatetime' : 500,
                 \ }
 
-    let g:quickrun_config.c = {
-                \ 'command' : 'gcc',
-                \ 'cmdopt' : s:copt . ' -O2',
-                \ 'tempfile': '%{tempname()}.c',
-                \ 'exec': ['%c %o %s -o %s:p:r', '%s:p:r %a'],
-                \ 'hook/quickrunex/enable' : 1,
-                \ 'hook/sweep/files': '%S:p:r',
-                \ 'hook/add_include_option/enable' : 1,
-                \ }
-    let g:quickrun_config.cpp = {
-                \ 'command' : 'g++',
-                \ 'cmdopt' : s:cppopt . ' -O2',
-                \ 'tempfile': '%{tempname()}.cpp',
-                \ 'exec': ['%c %o %s -o %s:p:r', '%s:p:r %a'],
-                \ 'hook/quickrunex/enable' : 1,
-                \ 'hook/sweep/files': '%S:p:r',
-                \ 'hook/add_include_option/enable' : 1,
-                \ }
     let g:quickrun_config['cpp/preprocess/g++'] = { 'type' : 'cpp/g++', 'exec' : '%c -P -E %s' }
     let g:quickrun_config['cpp/preprocess'] = { 'type' : 'cpp', 'exec' : '%c -P -E %s' }
     let g:quickrun_config['c/preprocess'] = { 'type' : 'c', 'exec' : '%c -P -E %s' }
@@ -1709,7 +1957,7 @@ if ! empty(neobundle#get('qfixhowm'))
     let g:QFixHowm_ScheduleSearchFile = ''
 endif
 
-let g:markdown_fenced_languages = ['vim', 'python', 'sh', 'c', 'cpp']
+let g:markdown_fenced_languages = ['vim', 'qmake', 'python', 'sh', 'c', 'cpp']
 
 
 if ! empty(neobundle#get('vim-fakeclip'))
@@ -1725,7 +1973,7 @@ if ! empty(neobundle#get('ZoomWin'))
 endif
 
 if ! empty(neobundle#get('vinarise'))
-    let g:vinarise_enable_auto_detect = 1
+    let g:vinarise_enable_auto_detect = 0
 endif
 
 if ! empty(neobundle#get('vim-altr'))
@@ -1852,3 +2100,15 @@ hi htmlH4 guifg=#F2D8DF gui=bold
 hi htmlH5 guifg=#00FF00  gui=bold
 " 緑
 hi htmlH6 guifg=#00FF00 gui=bold
+
+function! Strip(input_string)
+    return substitute(a:input_string, '^\s*\(.\{-}\)\s*$', '\1', '')
+endfunction
+
+colorscheme hybrid
+call UpdatePath()
+call SourceIfExist($HOME.'/.platform.vimrc')
+
+if(<SID>is_git_dir())
+    call SourceIfExist(GitRootDir() . '/.local.vimrc')
+endif

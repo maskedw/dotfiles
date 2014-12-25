@@ -22,15 +22,14 @@ PWD=`pwd`
 echo $PWD
 
 TARGET=".vimrc .gvimrc .vsvimrc "
-TARGET+=".gdbinit .ctags .gitignore .gitconfig.common"
+TARGET+=".gdbinit .ctags .gitignore .gitconfig.common "
+TARGET+=".neosnippets"
 for f in $TARGET ; do
-    echo $f
     ln -siv $PWD/$f $HOME/$f
 done
 
 TARGET=".gitconfig.unix"
 for f in $TARGET ; do
-    echo $f
     ln -siv $PWD/$f $HOME/`echo $f | sed s/\.unix//g`
 done
 

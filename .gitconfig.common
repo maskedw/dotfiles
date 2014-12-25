@@ -5,6 +5,9 @@
 [core]
     excludesfile = ~/.gitignore
 
+[ghq]
+    root = ~/local/src/ghq
+
 [color]
     ui = auto
 
