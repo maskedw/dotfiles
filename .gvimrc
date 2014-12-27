@@ -22,7 +22,7 @@ else
     set colorcolumn=0
 endif
 
-set cmdheight=3
+set cmdheight=2
 
 set wrap           " the longer line is wrapped
 set linebreak      " wrap at 'breakat'

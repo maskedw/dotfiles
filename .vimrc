@@ -29,7 +29,7 @@ AutocmdFT vim match myVimAutocmd /\<\(Autocmd\|AutocmdFT\)\>/
 if ! isdirectory(expand('~/vim.d/bundle'))
     echon "Installing neobundle.vim..."
     silent call mkdir(expand('~/vid.d/bundle'), 'p')
-    silent !git clone https://github.com/Shougo/neobundle.vim $HOME/.vim/bundle/neobundle.vim
+    execute '!git clone https://github.com/Shougo/neobundle.vim ' . expand('~/vim.d/bundle/neobundle.vim')
     echo "done."
     if v:shell_error
         echoerr "neobundle.vim installation has failed!"
@@ -532,7 +532,7 @@ set viewoptions=cursor,folds,slash,unix
 set history=100
 
 "コマンドラインの高さ(gVim用も別に用意する)
-set cmdheight=3
+set cmdheight=2
 
 "プレビューウインドウの高さ
 set previewheight=10
@@ -1028,7 +1028,7 @@ endif
 if ! empty(neobundle#get('unite.vim'))
     " uniteの説明については以下リンク先が詳しい。
     " http://komaken.me/blog/2014/05/07/%E3%81%84%E3%81%A4%E3%81%BE%E3%81%A7%E3%81%9F%E3%81%A3%E3%81%A6%E3%82%82unite-vim%E3%81%8C%E4%BD%BF%E3%81%84%E3%81%93%E3%81%AA%E3%81%9B%E3%81%AA%E3%81%84%E3%81%AE%E3%81%A7%E3%80%81%E3%81%95%E3%81%99/
-    let g:unite_enable_start_insert=1
+    let g:unite_enable_start_insert=0
     let g:unite_enable_split_vertically=1
     let g:unit_file_mru_limit=1000
     let g:unite_kind_file_use_trashbox = 1
