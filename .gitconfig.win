@@ -1,0 +1,22 @@
+[include]
+    path = ~/.gitconfig.common
+[core]
+    autocrlf = input
+
+[merge]
+    tool = WinMerge
+
+[ghq]
+    root = ~/local/src/ghq
+
+[mergetool "WinMerge"]
+    path = WinMergeU.exe
+    cmd = \"WinMergeU.exe\" /m /r=\"$MERGED\" \"$LOCAL\" \"$BASE\" \"$REMOTE\"
+
+[diff]
+    tool = WinMerge
+    guitool = WinMerge
+
+[difftool "WinMerge"]
+    path = WinMergeU.exe
+    cmd = \"WinMergeU.exe\" -e -ub -dl \"Base\" -dr \"Mine\" \"$LOCAL\" \"$REMOTE\"
