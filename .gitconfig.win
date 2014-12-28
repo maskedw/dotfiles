@@ -10,16 +10,13 @@
 [ghq]
     root = ~/local/src/ghq
 
-
 [mergetool "WinMerge"]
     path = WinMergeU.exe
     cmd = \"WinMergeU.exe\" /m /r=\"$MERGED\" \"$LOCAL\" \"$BASE\" \"$REMOTE\"
 
-
 [diff]
     tool = WinMerge
     guitool = WinMerge
-
 
 [difftool "WinMerge"]
     path = WinMergeU.exe
