@@ -12,5 +12,9 @@
     ui = auto
 
 [alias]
-    history = log --pretty=format:\\\"%h %ad | %s%d [%an]\\\" --graph --date=short
-    tree = log --graph --all --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(bold white)â€” %an%C(reset)%C(bold yellow)%d%C(reset)' --abbrev-commit --date=relative
+    today = log --oneline --since='12 hour ago'
+    tree = log --graph --date=short --decorate=short --pretty=format:'%Cgreen%h %Creset%cd | %Cblue%cn %Cred%d %Creset%s'
+    # Untracked files‚ğ•\¦‚¹‚¸Cnot staged‚ÆCstaged‚¾‚¯‚Ìó‘Ô‚ğo—Í‚·‚é
+    stt = status -uno
+    # s‚²‚Æ‚Ì·•ª‚¶‚á‚È‚­‚ÄC’PŒêƒŒƒxƒ‹‚Å‚Ì·•ª‚ğF•t‚«‚Å•\¦‚·‚é
+    difff = diff --word-diff
