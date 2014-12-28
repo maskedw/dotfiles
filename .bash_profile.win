@@ -1,0 +1,2 @@
+alias ls='ls --color=auto --show-control-chars'
+export LANG=ja_JP.UTF-8
