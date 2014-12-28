@@ -94,6 +94,10 @@ NeoBundle 'tyru/open-browser.vim'
 NeoBundle 'tyru/open-browser-github.vim'
 NeoBundle 'junegunn/vim-easy-align'
 
+" Powershell
+NeoBundle 'PProvost/vim-ps1'
+NeoBundle 'cd01/poshcomplete-vim'
+
 " utility
 NeoBundle 'scrooloose/syntastic'
 NeoBundle 'thinca/vim-quickrun'
@@ -124,6 +128,7 @@ NeoBundle 'sudo.vim'
 NeoBundle 'ctrlpvim/ctrlp.vim'
 NeoBundle 'rhysd/clever-f.vim'
 NeoBundle 'Lokaltog/vim-easymotion'
+NeoBundle 'mattn/webapi-vim'
 
 
 " 非同期処理
@@ -1012,8 +1017,9 @@ Autocmd CmdwinEnter * call s:InitCmdWin()
 " git commit message のときはスペルをチェックする
 AutocmdFT gitcommit setlocal nofoldenable spell | set fileencoding=utf-8
 AutocmdFT diff setlocal nofoldenable
-AutocmdFT c      setlocal omnifunc=ccomplete#Complete
-AutocmdFT cpp      setlocal omnifunc=ccomplete#Complete
+AutocmdFT c   setlocal omnifunc=ccomplete#Complete
+AutocmdFT cpp setlocal omnifunc=ccomplete#Complete
+AutocmdFT ps1 setlocal omnifunc=poshcomplete#CompleteCommand
 
 
 " スクリプトに実行可能属性を自動で付ける
@@ -1957,7 +1963,7 @@ if ! empty(neobundle#get('qfixhowm'))
     let g:QFixHowm_ScheduleSearchFile = ''
 endif
 
-let g:markdown_fenced_languages = ['vim', 'qmake', 'python', 'sh', 'c', 'cpp']
+let g:markdown_fenced_languages = ['vim', 'qmake', 'python', 'sh', 'c', 'cpp', 'ps1']
 
 
 if ! empty(neobundle#get('vim-fakeclip'))
