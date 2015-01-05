@@ -3,12 +3,14 @@ if !1 | finish | endif
 
 set nospell
 scriptencoding utf-8
-set shellslash
-set shell=bash.exe
-set shellslash
-set shellcmdflag=-c
-set shellpipe=\|&\ tee
-set shellredir=>%s\ 2>&1
+
+if has('win32') || has('win64')
+    set shellslash
+    set shell=bash.exe
+    set shellcmdflag=-c
+    set shellpipe=\|\ tee
+    set shellredir=>%s\ 2>&1
+endif
 " if has("gui_win32")
 " 	if $TERM == ""
 " 		set shell=bash.exe\ --login
@@ -63,6 +65,8 @@ call neobundle#begin(expand('~/vim.d/bundle/'))
 
 " Let NeoBundle manage NeoBundle
 NeoBundleFetch 'Shougo/neobundle.vim'
+" かっちょいいカラーテーマ
+NeoBundle 'w0ng/vim-hybrid'
 NeoBundle 'Shougo/neocomplete.vim'
 NeoBundle 'Shougo/neosnippet'
 NeoBundle 'Shougo/neosnippet-snippets'
@@ -71,7 +75,12 @@ NeoBundle 'Shougo/vinarise'
 NeoBundle 'lambdalisue/vim-gista'
 NeoBundle 'rhysd/committia.vim'
 NeoBundle 'idanarye/vim-merginal'
-
+NeoBundleLazy 'davidhalter/jedi-vim', {
+    \ 'autoload' : {
+    \     'filetypes' : 'python',
+    \    },
+    \  }
+"
 NeoBundle 'tsukkee/unite-tag'
 NeoBundle 'Shougo/unite-outline'
 NeoBundle 'ujihisa/unite-colorscheme'
@@ -82,8 +91,8 @@ NeoBundle 'osyo-manga/unite-quickfix'
 NeoBundle 'rhysd/quickrun-unite-quickfix-outputter'
 NeoBundle 'rhysd/unite-locate'
 NeoBundle 'sgur/unite-everything'
-
-" C/C++
+"
+" " C/C++
 NeoBundle 'artoj/qmake-syntax-vim'
 NeoBundle 'vim-scripts/Mixed-sourceassembly-syntax-objdump'
 NeoBundle 'majutsushi/tagbar'
@@ -93,10 +102,9 @@ NeoBundle 'https://bitbucket.org/kh3phr3n/vim-qt-syntax.git'
 NeoBundle 'vim-scripts/DoxygenToolkit.vim'
 NeoBundle 'vim-scripts/doxygen-support.vim'
 NeoBundle 'rhysd/vim-clang-format'
-NeoBundle 'rhysd/clang-extent-selector.vim'
-NeoBundle 'rhysd/clang-type-inspector.vim'
-NeoBundle 'rhysd/vim-clang-format'
-
+" NeoBundle 'rhysd/clang-extent-selector.vim'
+" NeoBundle 'rhysd/clang-type-inspector.vim'
+"
 " memo
 NeoBundle 'fuenor/qfixhowm'
 NeoBundle 'fuenor/JpFormat.vim'
@@ -125,17 +133,17 @@ NeoBundle 'thinca/vim-guicolorscheme'
 " CUI版Vimでもクリップボードを使用できるようにする
 NeoBundle 'kana/vim-fakeclip'
 " ステータスラインをかっこよくする
-NeoBundle 'bling/vim-airline'
+" @note
+" vim-airlineを使用していると、数千行あるファイルを開いた時にクソ重くなったの
+" でやめ。lightlineに乗り換えた。
+" NeoBundle 'bling/vim-airline'
+NeoBundle 'itchyny/lightline.vim'
 NeoBundle 'vim-scripts/DirDiff.vim'
 NeoBundle 'liotaz/BlockDiff'
 " スクラッチバッファ
 NeoBundle 'duff/vim-scratch'
 " 関連するファイルを開きやすくする。
 NeoBundle 'kana/vim-altr'
-" かっちょいいカラーテーマ
-NeoBundle 'w0ng/vim-hybrid'
-
-
 " NeoBundle 'vim-scripts/YankRing.vim'
 " リファレンスの参照
 NeoBundle 'thinca/vim-ref'
@@ -144,11 +152,10 @@ NeoBundle "airblade/vim-rooter"
 NeoBundle 'vim-jp/vimdoc-ja'
 NeoBundle 'sudo.vim'
 NeoBundle 'ctrlpvim/ctrlp.vim'
+NeoBundle 'mattn/ctrlp-ghq'
 NeoBundle 'rhysd/clever-f.vim'
 NeoBundle 'Lokaltog/vim-easymotion'
 NeoBundle 'mattn/webapi-vim'
-
-
 " 非同期処理
 NeoBundle 'Shougo/vimproc', {
     \ 'build' : {
@@ -177,6 +184,12 @@ NeoBundleLazy 'Shougo/unite.vim', {
     \   }
     \ }
 
+NeoBundleLazy 'sorah/unite-ghq', {
+        \ 'autoload' : {
+        \       'unite_sources' : 'ghq'
+        \   }
+        \ }
+
 NeoBundleLazy 'tyru/caw.vim', {
     \ 'autoload' : {
     \     'mappings' :
@@ -196,12 +209,11 @@ NeoBundleLazy 'vim-scripts/ZoomWin', {
 "     \     }
 "     \ }
 
-NeoBundle 'tpope/vim-fugitive'
-" NeoBundleLazy 'tpope/vim-fugitive', {
-"     \ 'autoload' : {
-"     \       'commands' : ['Gstatus', 'Gcommit', 'Gwrite', 'Gdiff', 'Gblame', 'Git', 'Ggrep']
-"     \   }
-"     \ }
+NeoBundleLazy 'tpope/vim-fugitive', {
+    \ 'autoload' : {
+    \       'commands' : ['Gstatus', 'Gcommit', 'Gwrite', 'Gdiff', 'Gblame', 'Git', 'Ggrep']
+    \   }
+    \ }
 
 NeoBundleLazy 'itchyny/calendar.vim', {
     \ 'autoload' : {
@@ -224,22 +236,13 @@ NeoBundleLazy 'cohama/agit.vim', {
     \     'commands' : 'Agit'
     \   }
     \ }
-"
-" " C++用のプラグイン
-" どうも他のC/C++プラグインもLazyにしていると、clang_completeの補完が効かなくな
-" る時がある。よくわからんが、他のはLazyをやめておく。
+
+" @note
+" どうも他のC/C++プラグインもLazyにしていると、clang_completeの補完が効かなく
+" なる時がある。よくわからんが、clang_completeだけLazyにしておく。
 NeoBundleLazy 'Rip-Rip/clang_complete', {
     \ 'autoload' : {'filetypes' : ['c', 'cpp']}
     \ }
-" NeoBundle 'Rip-Rip/clang_complete'
-
-" Python
-" NeoBundle 'davidhalter/jedi-vim'
-NeoBundleLazy 'davidhalter/jedi-vim', {
-    \ 'autoload' : {
-    \     'filetypes' : 'python',
-    \    },
-    \  }
 
 NeoBundleLazy 'hynek/vim-python-pep8-indent', {
     \ 'autoload' : {
@@ -254,11 +257,11 @@ NeoBundleLazy 'digitaltoad/vim-jade', {
     \ }
 
 " JSON
-" NeoBundleLazy 'elzr/vim-json', {
-"     \ 'autoload' : {'filetypes' : ['json', 'markdown']}
-"     \ }
-"
-" " Bash
+NeoBundleLazy 'elzr/vim-json', {
+    \ 'autoload' : {'filetypes' : ['json', 'markdown']}
+    \ }
+
+" Bash
 " NeoBundleLazy 'vim-scripts/bash-support.vim', {
 "     \ 'autoload' : {
 "     \     'filetypes' : 'sh',
@@ -273,24 +276,24 @@ NeoBundleLazy 'digitaltoad/vim-jade', {
 "     \   }
 "     \ }
 "
-NeoBundleLazy 'rhysd/unite-go-import.vim', {
-    \ 'autoload' : {
-    \     'depends' : ['Shougo/unite.vim', 'Blackrush/vim-gocode'],
-    \     'unite_sources' : 'go/import',
-    \   }
-    \ }
-
-NeoBundleLazy 'dgryski/vim-godef', {
-    \ 'autoload' : {
-    \     'filetypes' : 'go'
-    \   }
-    \ }
-
-NeoBundleLazy 'rhysd/vim-go-impl', {
-    \ 'autoload' : {
-    \     'filetypes' : 'go'
-    \   }
-    \ }
+" NeoBundleLazy 'rhysd/unite-go-import.vim', {
+"     \ 'autoload' : {
+"     \     'depends' : ['Shougo/unite.vim', 'Blackrush/vim-gocode'],
+"     \     'unite_sources' : 'go/import',
+"     \   }
+"     \ }
+"
+" NeoBundleLazy 'dgryski/vim-godef', {
+"     \ 'autoload' : {
+"     \     'filetypes' : 'go'
+"     \   }
+"     \ }
+"
+" NeoBundleLazy 'rhysd/vim-go-impl', {
+"     \ 'autoload' : {
+"     \     'filetypes' : 'go'
+"     \   }
+"     \ }
 call neobundle#end()
 
 NeoBundleCheck
@@ -539,10 +542,19 @@ set backup
 "スワップファイルを使用しない
 set noswapfile
 
-set viewdir=~/vim.d/view
-set backupdir=~/vim.d/backup
-set directory=~/vim.d/swap
-set undodir=~/vim.d/undo
+let s:viewdir=expand('~/vim.d/view')
+let s:backupdir=expand('~/vim.d/backup')
+let s:swapdir=expand('~/vim.d/swap')
+let s:undodir=expand('~/vim.d/undo')
+for d in [s:viewdir, s:backupdir, s:swapdir, s:undodir]
+    if ! isdirectory(d)
+        call mkdir(d, 'p')
+    endif
+endfor
+execute 'set viewdir=' . s:viewdir
+execute 'set backupdir=' . s:backupdir
+execute 'set directory=' . s:swapdir
+execute 'set undodir=' . s:undodir
 set undofile
 
 "!! 何故かこのオプションを有効にすると、neocomplcacheが異常に重くなる。
@@ -699,7 +711,7 @@ cnoremap <C-g> <C-u><BS>
 nnoremap <silent><C-n>   :<C-u>bnext<CR>
 nnoremap <silent><C-p>   :<C-u>bprevious<CR>
 "<BS>の挙動
-nnoremap <BS> diw
+" nnoremap <BS> diw
 
 nnoremap          [tab]  <nop>
 nmap     <Space>t [tab]
@@ -730,12 +742,19 @@ nnoremap <silent>[cscope]f :<C-u>cs find f <C-R>=expand("<cfile>")<CR><CR>
 nnoremap <silent>[cscope]i :<C-u>cs find i ^<C-R>=expand("<cfile>")<CR>$<CR>
 
 if ! empty(neobundle#get('ctrlp.vim'))
-    nnoremap              [ctrlp]  <nop>
-    nmap     <Space><C-p> [ctrlp]
+    nnoremap          [ctrlp]  <nop>
+    nmap     <C-p>    [ctrlp]
     nnoremap <silent> [ctrlp]<C-p>    :<C-u>CtrlP<CR>
     nnoremap <silent> [ctrlp]<C-b>    :<C-u>CtrlPBuffer<CR>
     nnoremap <silent> [ctrlp]<C-m>    :<C-u>CtrlPMRU<CR>
     nnoremap <silent> [ctrlp]<C-r>    :<C-u>CtrlPRoot<CR>
+    nnoremap <silent> [ctrlp]<C-g>    :<c-u>CtrlPGhq<cr>
+    let g:ctrlp_ghq_actions = [
+    \ {"label": "Open", "action": "e", "path": 1},
+    \ {"label": "Look", "action": "!ghq look", "path": 0},
+    \]
+    let ctrlp_ghq_default_action = 'e'
+    let g:ctrlp_ghq_cache_enabled = 1
 endif
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -1058,9 +1077,12 @@ if ! empty(neobundle#get('unite.vim'))
     let g:unite_kind_file_use_trashbox = 1
 
     call unite#custom_default_action('find' , 'vimfiler')
+    " call unite#custom_default_action('source/find' , 'vimfiler')
     call unite#custom_default_action('source/bookmark/directory' , 'vimfiler')
     call unite#custom_default_action('vimshell/history' , 'insert')
     call unite#custom_default_action('vimshell/external_history' , 'insert')
+    " call unite#custom_default_action('source/ghq' , 'vimfiler')
+    " call unite#custom#profile('source/ghq', 'context', {'default_action' : 'vimfiler'})
 
     nnoremap         [unite]  <nop>
     nmap    <Space>u [unite]
@@ -1068,261 +1090,58 @@ if ! empty(neobundle#get('unite.vim'))
     " コマンドラインウィンドウで Unite コマンドを入力
     nnoremap [unite]u               :<C-u>Unite source<CR>
     " バッファを開いた時のパスを起点としたファイル検索
-    nnoremap <silent>[unite]f       :<C-u>UniteWithBufferDir -buffer-name=files -vertical file directory file/new<CR>
+    nnoremap [unite]f       :<C-u>UniteWithBufferDir -buffer-name=files -vertical file directory file/new<CR>
     " 指定したディレクトリ以下を再帰的に開く
-    nnoremap <silent>[unite]F       :<C-u>UniteWithBufferDir -no-start-insert file_rec/async -auto-resize<CR>
+    nnoremap [unite]F       :<C-u>UniteWithBufferDir -no-start-insert file_rec/async -auto-resize<CR>
     " 最近使用したファイル
-    nnoremap <silent>[unite]m       :<C-u>Unite file_mru directory_mru file/new<CR>
+    nnoremap [unite]m       :<C-u>Unite file_mru directory_mru file/new<CR>
     " バッファ一覧
-    nnoremap <silent>[unite]b       :<C-u>Unite -immediately -no-empty -auto-preview buffer<CR>
+    nnoremap [unite]b       :<C-u>Unite -immediately -no-empty -auto-preview buffer<CR>
     " プログラミングにおけるアウトラインの表示
-    " nnoremap <silent>[unite]o       :<C-u>Unite outline -vertical -no-start-insert -auto-preview -no-quit<CR>
-    nnoremap <silent>[unite]o       :<C-u>Unite outline -vertical -no-start-insert -auto-preview<CR>
+    " nnoremap [unite]o       :<C-u>Unite outline -vertical -no-start-insert -auto-preview -no-quit<CR>
+    nnoremap [unite]o       :<C-u>Unite outline -vertical -no-start-insert -auto-preview<CR>
     " コマンドの出力
-    nnoremap <silent>[unite]O       :<C-u>Unite output<CR>
-    nnoremap <silent>[unite]c       :<C-u>Unite codic<CR>
+    nnoremap [unite]O       :<C-u>Unite output<CR>
+    nnoremap [unite]c       :<C-u>Unite codic<CR>
     " grep検索．
-    nnoremap <silent>[unite]g       :<C-u>Unite -no-start-insert grep -auto-preview<CR>
+    nnoremap [unite]gg      :<C-u>Unite -no-start-insert grep -auto-preview<CR>
+    " ghq
+    nnoremap [unite]gh      :<C-u>Unite -start-insert -default-action=vimfiler ghq directory_mru<CR>
     " Git のルートディレクトリを開く
-    nnoremap <silent><expr>[unite]G  ":\<C-u>Unite file -input=".fnamemodify(GitRootDir(),":p")
+    nnoremap <expr>[unite]G  ":\<C-u>Unite file -input=".fnamemodify(GitRootDir(),":p")
     " Uniteバッファの復元
-    nnoremap <silent>[unite]r       :<C-u>UniteResume<CR>
+    nnoremap [unite]r       :<C-u>UniteResume<CR>
     " Unite ソース一覧
-    nnoremap <silent>[unite]s       :<C-u>Unite source -vertical<CR>
+    nnoremap [unite]s       :<C-u>Unite source -vertical<CR>
     " ブックマーク
-    noremap <silent>[unite]B        :<C-u>Unite bookmark<CR>
+    noremap [unite]B        :<C-u>Unite bookmark<CR>
     " レジスタ
-    noremap <silent>[unite]R        :<C-u>Unite -buffer-name=register register<CR>
+    noremap [unite]R        :<C-u>Unite -buffer-name=register register<CR>
     " help(項目が多いので，検索語を入力してから絞り込む)
-    nnoremap <silent>[unite]hh      :<C-u>UniteWithInput help -vertical<CR>
+    nnoremap [unite]hh      :<C-u>UniteWithInput help -vertical<CR>
     " 履歴
-    nnoremap <silent>[unite]hc      :<C-u>Unite -buffer-name=lines history/command -start-insert<CR>
-    nnoremap <silent>[unite]hs      :<C-u>Unite -buffer-name=lines history/search<CR>
-    nnoremap <silent>[unite]hy      :<C-u>Unite -buffer-name=lines history/yank<CR>
+    nnoremap [unite]hc      :<C-u>Unite -buffer-name=lines history/command -start-insert<CR>
+    nnoremap [unite]hs      :<C-u>Unite -buffer-name=lines history/search<CR>
+    nnoremap [unite]hy      :<C-u>Unite -buffer-name=lines history/yank<CR>
 
 
     " unite-lines ファイル内インクリメンタル検索
-    nnoremap <silent><expr> [unite]L line('$') > 5000 ?
+    nnoremap <expr> [unite]L line('$') > 5000 ?
                 \ ":\<C-u>Unite -no-split -start-insert -auto-preview line/fast\<CR>" :
                 \ ":\<C-u>Unite -start-insert -auto-preview line:all\<CR>"
     " カラースキーム
     nnoremap [unite]C :<C-u>Unite -auto-preview colorscheme<CR>
     " 検索
-    nnoremap <silent>[unite]/ :<C-u>execute 'Unite grep:'.expand('%:p').' -input='.escape(substitute(@/, '^\\v', '', ''), ' \')<CR>
+    nnoremap [unite]/ :<C-u>execute 'Unite grep:'.expand('%:p').' -input='.escape(substitute(@/, '^\\v', '', ''), ' \')<CR>
 
     " エンターの代わりに以下のキーでウィンドウを水平分割して開く
-    AutocmdFT unite nnoremap <silent> <buffer> <expr> <C-S> unite#do_action('split')
-    AutocmdFT unite inoremap <silent> <buffer> <expr> <C-S> unite#do_action('split')
+    AutocmdFT unite nnoremap  <buffer> <expr> <C-S> unite#do_action('split')
+    AutocmdFT unite inoremap  <buffer> <expr> <C-S> unite#do_action('split')
     " エンターの代わりに以下のキーでウィンドウを垂直分割して開く
-    AutocmdFT unite nnoremap <silent> <buffer> <expr> <C-V> unite#do_action('vsplit')
-    AutocmdFT unite inoremap <silent> <buffer> <expr> <C-V> unite#do_action('vsplit')
+    AutocmdFT unite nnoremap  <buffer> <expr> <C-V> unite#do_action('vsplit')
+    AutocmdFT unite inoremap  <buffer> <expr> <C-V> unite#do_action('vsplit')
 endif
 
-"@============================================================
-	" " Note: This option must set it in .vimrc(_vimrc).
-	" " NOT IN .gvimrc(_gvimrc)!
-	" " Disable AutoComplPop.
-	" let g:acp_enableAtStartup = 0
-	" " Use neocomplete.
-	" let g:neocomplete#enable_at_startup = 1
-	" " Use smartcase.
-	" let g:neocomplete#enable_smart_case = 1
-	" " Set minimum syntax keyword length.
-	" let g:neocomplete#sources#syntax#min_keyword_length = 3
-	" let g:neocomplete#lock_buffer_name_pattern = '\*ku\*'
-
-	" " Define dictionary.
-	" let g:neocomplete#sources#dictionary#dictionaries = {
-	"     \ 'default' : '',
-	"     \ 'vimshell' : $HOME.'/.vimshell_hist',
-	"     \ 'scheme' : $HOME.'/.gosh_completions'
-	"     \ }
-
-	" " Define keyword.
-	" if !exists('g:neocomplete#keyword_patterns')
-	"     let g:neocomplete#keyword_patterns = {}
-	" endif
-	" let g:neocomplete#keyword_patterns['default'] = '\h\w*'
-
-	" " Plugin key-mappings.
-	" inoremap <expr><C-g>     neocomplete#undo_completion()
-	" inoremap <expr><C-l>     neocomplete#complete_common_string()
-
-	" " Recommended key-mappings.
-	" " <CR>: close popup and save indent.
-	" inoremap <silent> <CR> <C-r>=<SID>my_cr_function()<CR>
-	" function! s:my_cr_function()
-	"   return neocomplete#close_popup() . "\<CR>"
-	"   " For no inserting <CR> key.
-	"   "return pumvisible() ? neocomplete#close_popup() : "\<CR>"
-	" endfunction
-	" " <TAB>: completion.
-	" inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
-	" " <C-h>, <BS>: close popup and delete backword char.
-	" inoremap <expr><C-h> neocomplete#smart_close_popup()."\<C-h>"
-	" inoremap <expr><BS> neocomplete#smart_close_popup()."\<C-h>"
-	" inoremap <expr><C-y>  neocomplete#close_popup()
-	" inoremap <expr><C-e>  neocomplete#cancel_popup()
-	" " Close popup by <Space>.
-	" "inoremap <expr><Space> pumvisible() ? neocomplete#close_popup() : "\<Space>"
-
-	" " For cursor moving in insert mode(Not recommended)
-	" "inoremap <expr><Left>  neocomplete#close_popup() . "\<Left>"
-	" "inoremap <expr><Right> neocomplete#close_popup() . "\<Right>"
-	" "inoremap <expr><Up>    neocomplete#close_popup() . "\<Up>"
-	" "inoremap <expr><Down>  neocomplete#close_popup() . "\<Down>"
-	" " Or set this.
-	" "let g:neocomplete#enable_cursor_hold_i = 1
-	" " Or set this.
-	" "let g:neocomplete#enable_insert_char_pre = 1
-
-	" " AutoComplPop like behavior.
-	" "let g:neocomplete#enable_auto_select = 1
-
-	" " Shell like behavior(not recommended).
-	" "set completeopt+=longest
-	" "let g:neocomplete#enable_auto_select = 1
-	" "let g:neocomplete#disable_auto_complete = 1
-	" "inoremap <expr><TAB>  pumvisible() ? "\<Down>" :
-	" " \ neocomplete#start_manual_complete()
-
-	" " Enable omni completion.
-	" autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
-	" autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
-	" autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
-	" autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
-	" autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
-
-	" " Enable heavy omni completion.
-	" if !exists('g:neocomplete#sources#omni#input_patterns')
-	"   let g:neocomplete#sources#omni#input_patterns = {}
-	" endif
-	" if !exists('g:neocomplete#force_omni_input_patterns')
-	"   let g:neocomplete#force_omni_input_patterns = {}
-	" endif
-	" "let g:neocomplete#sources#omni#input_patterns.php =
-	" "\ '[^. \t]->\%(\h\w*\)\?\|\h\w*::\%(\h\w*\)\?'
-	" "let g:neocomplete#sources#omni#input_patterns.c =
-	" "\ '[^.[:digit:] *\t]\%(\.\|->\)\%(\h\w*\)\?'
-	" "let g:neocomplete#sources#omni#input_patterns.cpp =
-	" "\ '[^.[:digit:] *\t]\%(\.\|->\)\%(\h\w*\)\?\|\h\w*::\%(\h\w*\)\?'
-
-	" " For perlomni.vim setting.
-	" " https://github.com/c9s/perlomni.vim
-	" let g:neocomplete#sources#omni#input_patterns.perl =
-	" \ '[^. \t]->\%(\h\w*\)\?\|\h\w*::\%(\h\w*\)\?'
-
-	" " For smart TAB completion.
-	" "inoremap <expr><TAB>  pumvisible() ? "\<C-n>" :
-	" "        \ <SID>check_back_space() ? "\<TAB>" :
-	" "        \ neocomplete#start_manual_complete()
-	" "  function! s:check_back_space() "{{{
-	" "    let col = col('.') - 1
-	" "    return !col || getline('.')[col - 1]  =~ '\s'
-	" "  endfunction"}}}
-
-	" " " Note: This option must set it in .vimrc(_vimrc).
-	" " " NOT IN .gvimrc(_gvimrc)!
-	" " " Disable AutoComplPop.
-	" " let g:acp_enableAtStartup = 0
-	" " " Use neocomplete.
-	" " let g:neocomplete#enable_at_startup = 1
-	" " " Use smartcase.
-	" " let g:neocomplete#enable_smart_case = 1
-	" " " Set minimum syntax keyword length.
-	" " let g:neocomplete#sources#syntax#min_keyword_length = 3
-	" " let g:neocomplete#lock_buffer_name_pattern = '\*ku\*'
-
-	" " " Define dictionary.
-	" " let g:neocomplete#sources#dictionary#dictionaries = {
-	" "     \ 'default' : '',
-	" "     \ 'vimshell' : $HOME.'/.vimshell_hist',
-	" "     \ 'scheme' : $HOME.'/.gosh_completions'
-	" "     \ }
-
-	" " " Define keyword.
-	" " if !exists('g:neocomplete#keyword_patterns')
-	" "     let g:neocomplete#keyword_patterns = {}
-	" " endif
-	" " let g:neocomplete#keyword_patterns['default'] = '\h\w*'
-
-	" " " Plugin key-mappings.
-	" " inoremap <expr><C-g>     neocomplete#undo_completion()
-	" " inoremap <expr><C-l>     neocomplete#complete_common_string()
-
-	" " " Recommended key-mappings.
-	" " " <CR>: close popup and save indent.
-	" " inoremap <silent> <CR> <C-r>=<SID>my_cr_function()<CR>
-	" " function! s:my_cr_function()
-	" "   return neocomplete#close_popup() . "\<CR>"
-	" "   " For no inserting <CR> key.
-	" "   "return pumvisible() ? neocomplete#close_popup() : "\<CR>"
-	" " endfunction
-	" " " <TAB>: completion.
-	" " inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
-	" " " <C-h>, <BS>: close popup and delete backword char.
-	" " inoremap <expr><C-h> neocomplete#smart_close_popup()."\<C-h>"
-	" " inoremap <expr><BS> neocomplete#smart_close_popup()."\<C-h>"
-	" " inoremap <expr><C-y>  neocomplete#close_popup()
-	" " inoremap <expr><C-e>  neocomplete#cancel_popup()
-	" " " Close popup by <Space>.
-	" " "inoremap <expr><Space> pumvisible() ? neocomplete#close_popup() : "\<Space>"
-
-	" " " For cursor moving in insert mode(Not recommended)
-	" " "inoremap <expr><Left>  neocomplete#close_popup() . "\<Left>"
-	" " "inoremap <expr><Right> neocomplete#close_popup() . "\<Right>"
-	" " "inoremap <expr><Up>    neocomplete#close_popup() . "\<Up>"
-	" " "inoremap <expr><Down>  neocomplete#close_popup() . "\<Down>"
-	" " " Or set this.
-	" " "let g:neocomplete#enable_cursor_hold_i = 1
-	" " " Or set this.
-	" " "let g:neocomplete#enable_insert_char_pre = 1
-
-	" " " AutoComplPop like behavior.
-	" " "let g:neocomplete#enable_auto_select = 1
-
-	" " " Shell like behavior(not recommended).
-	" " "set completeopt+=longest
-	" " "let g:neocomplete#enable_auto_select = 1
-	" " "let g:neocomplete#disable_auto_complete = 1
-	" " "inoremap <expr><TAB>  pumvisible() ? "\<Down>" :
-	" " " \ neocomplete#start_manual_complete()
-
-	" " " Enable omni completion.
-	" " autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
-	" " autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
-	" " autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
-	" " autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
-	" " autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
-
-	" " " Enable heavy omni completion.
-	" " if !exists('g:neocomplete#sources#omni#input_patterns')
-	" "   let g:neocomplete#sources#omni#input_patterns = {}
-	" " endif
-	" " if !exists('g:neocomplete#force_omni_input_patterns')
-	" "   let g:neocomplete#force_omni_input_patterns = {}
-	" " endif
-	" " "let g:neocomplete#sources#omni#input_patterns.php =
-	" " "\ '[^. \t]->\%(\h\w*\)\?\|\h\w*::\%(\h\w*\)\?'
-	" " "let g:neocomplete#sources#omni#input_patterns.c =
-	" " "\ '[^.[:digit:] *\t]\%(\.\|->\)\%(\h\w*\)\?'
-	" " "let g:neocomplete#sources#omni#input_patterns.cpp =
-	" " "\ '[^.[:digit:] *\t]\%(\.\|->\)\%(\h\w*\)\?\|\h\w*::\%(\h\w*\)\?'
-
-	" " " For perlomni.vim setting.
-	" " " https://github.com/c9s/perlomni.vim
-	" " let g:neocomplete#sources#omni#input_patterns.perl =
-	" " \ '[^. \t]->\%(\h\w*\)\?\|\h\w*::\%(\h\w*\)\?'
-
-	" " " For smart TAB completion.
-	" " "inoremap <expr><TAB>  pumvisible() ? "\<C-n>" :
-	" " "        \ <SID>check_back_space() ? "\<TAB>" :
-	" " "        \ neocomplete#start_manual_complete()
-	" " "  function! s:check_back_space() "{{{
-	" " "    let col = col('.') - 1
-	" " "    return !col || getline('.')[col - 1]  =~ '\s'
-	" " "  endfunction"}}}
-"@============================================================
 if ! empty(neobundle#get('neocomplete.vim'))
 
     " For snippet_complete marker.
@@ -1360,7 +1179,7 @@ if ! empty(neobundle#get('neocomplete.vim'))
 	AutocmdFT css setlocal omnifunc=csscomplete#CompleteCSS
 	AutocmdFT html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
 	AutocmdFT javascript setlocal omnifunc=javascriptcomplete#CompleteJS
-	AutocmdFT python setlocal omnifunc=pythoncomplete#Complete
+	" AutocmdFT python setlocal omnifunc=pythoncomplete#Complete
 	AutocmdFT xml setlocal omnifunc=xmlcomplete#CompleteTags
     AutocmdFT c setlocal omnifunc=ccomplete#Complete
 
@@ -1456,8 +1275,6 @@ if ! empty(neobundle#get('clang_complete'))
         let g:clang_library_path = '/usr/lib'
     endif
 
-    " let g:clang_user_options      = '-std=c++11'
-    " let g:clang_auto_user_options ='path, .clang_complete'
     let g:clang_auto_user_options =''
     let g:clang_snippets = 1
     let g:clang_snippets_engine = 'clang_complete'
@@ -1471,7 +1288,7 @@ endif
 
 if ! empty(neobundle#get('jedi-vim'))
     let g:jedi#force_py_version = 3
-    let g:jedi#auto_initialization = 1
+    " let g:jedi#auto_initialization = 1
     let g:jedi#auto_vim_configuration = 0
     let g:jedi#completions_enabled = 0
     let g:jedi#popup_select_first = 0
@@ -1489,28 +1306,15 @@ if ! empty(neobundle#get('jedi-vim'))
     let g:jedi#completions_command = ''
     let g:jedi#rename_command = ''
 
-    " let g:jedi#completions_command = '<leader>j'
-    " let g:jedi#auto_initialization = 0
-    " let g:jedi#auto_vim_configuration = 0
-    " let g:jedi#popup_select_first = 0
-    " let g:jedi#documentation_command = ''
-    " let g:jedi#force_py_version = 3
-    " let g:jedi#show_call_signatures = 2
     nnoremap            [jedi] <nop>
     nmap     <Space>j   [jedi]
-
-    function! s:jedi_settings()
-        nnoremap <buffer>[jedi]r :<C-u>call jedi#rename()<CR>
-        nnoremap <buffer>[jedi]g :<C-u>call jedi#goto_assignments()<CR>
-        nnoremap <buffer>[jedi]d :<C-u>call jedi#goto_definitions()<CR>
-        nnoremap <buffer>[jedi]k :<C-u>call jedi#show_documentation()<CR>
-        nnoremap <buffer>[jedi]u :<C-u>call jedi#usages()<CR>
-        nnoremap <buffer>[jedi]i :<C-u>Pyimport<Space>
-        setlocal omnifunc=jedi#completions
-        setlocal completeopt-=preview
-        command! -nargs=0 JediRename call jedi#rename()
-    endfunction
-    AutocmdFT python call <SID>jedi_settings()
+    nnoremap [jedi]r    :<C-u>call jedi#rename()<CR>
+    nnoremap [jedi]g    :<C-u>call jedi#goto_assignments()<CR>
+    nnoremap [jedi]d    :<C-u>call jedi#goto_definitions()<CR>
+    nnoremap [jedi]k    :<C-u>call jedi#show_documentation()<CR>
+    nnoremap [jedi]u    :<C-u>call jedi#usages()<CR>
+    nnoremap [jedi]i    :<C-u>Pyimport<Space>
+    command! -nargs=0 JediRename call jedi#rename()
 endif
 
 if ! empty(neobundle#get('vimfiler.vim'))
@@ -1534,9 +1338,9 @@ if ! empty(neobundle#get('vimfiler.vim'))
     " vimfilerをexploler風に開く
     nnoremap [vimfiler]e        :<C-u>VimFilerExplorer<CR>
     " .gitのあるディレクトリを開く。
-    nnoremap <silent><expr>[vimfiler]g ":\<C-u>VimFiler " . <SID>GitRootDir() . '\<CR>'
+    nnoremap <expr>[vimfiler]g ":\<C-u>VimFiler " . <SID>GitRootDir() . '\<CR>'
     " .gitのあるディレクトリをexploer風に開く。
-    nnoremap <silent><expr>[vimfiler]<S-g> ":\<C-u>VimFilerExplorer " . <SID>GitRootDir() . '\<CR>'
+    nnoremap <expr>[vimfiler]<S-g> ":\<C-u>VimFilerExplorer " . <SID>GitRootDir() . '\<CR>'
 
     let g:vimfiler_as_default_explorer = 1
     let g:vimfiler_safe_mode_by_default = 0
@@ -1602,8 +1406,8 @@ if ! empty(neobundle#get('clever-f.vim'))
     let g:clever_f_smart_case = 1
     " migemoを使用する、しない
     let g:clever_f_use_migemo = 1
-    " 行をまたいでf検索をする、しない
-    let g:clever_f_across_no_line = 0
+    " 行をまたいでf検索をしない、する
+    let g:clever_f_across_no_line = 1
     " fで順方向、Fで逆方向に移動方向を固定する、しない
     let g:clever_f_fix_key_direction = 1
     " 任意の記号にマッチする文字を指定する。
@@ -2103,13 +1907,19 @@ if ! empty(neobundle#get('JpFormat.vim'))
     let JpFormat_formatexpr = ''
 endif
 
-nnoremap <Space>tt :<C-u>TagbarToggle<CR>
-let g:tagbar_left = 1
-let g:tagbar_autofocus = 1
-let g:tagbar_map_togglesort = "r"
-let g:tagbar_singleclick = 1
-let g:tagbar_autoshowtag = 1
-let g:tagbar_autopreview = 1
+if ! empty(neobundle#get('tagbar'))
+    nnoremap <Space>tt :<C-u>TagbarToggle<CR>
+    let g:tagbar_left = 1
+    let g:tagbar_autofocus = 1
+    let g:tagbar_map_togglesort = "r"
+    let g:tagbar_singleclick = 1
+    let g:tagbar_autoshowtag = 1
+    let g:tagbar_autopreview = 0
+endif
+
+if ! empty(neobundle#get('vim-rooter'))
+    let g:rooter_manual_only = 1
+endif
 
 " ピンク
 hi htmlH1 guifg=#F2D8DF gui=bold
