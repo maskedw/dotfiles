@@ -1,7 +1,8 @@
 ##########################################################################
 # gdbの初期化ファイル。１行目を空行にすると読み込まれないようなので注意
 ##########################################################################
-
+set auto-load safe-path /
+# set environment LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/lib/debug
 ##########################################################################
 # デバッグ対象が子プロセスを生成した時に、どちらのプロセスを
 # デバッグ対象にするか選択する
@@ -16,7 +17,7 @@ set follow-fork-mode parent
 # に達した、シグナルが送信されたなど)
 #set scheduler-locking off
 # カレントスレッドだけが実行される
-#set scheduler-locking on
+# set scheduler-locking on
 # シングルステップ時のみスケジューラがロックされる。
 #set scheduler-locking step
 
@@ -98,7 +99,7 @@ define bsave
     set logging off
     # reformat on-the-fly to a valid gdb command file
     shell perl -n -e 'print "break $1\n" if /^\d+.+?(\S+)$/g' brestore.txt > brestore.gdb
-end 
+end
 document bsave
   store actual breakpoints
 end
@@ -200,7 +201,7 @@ define hexdump
 end
 document hexdump
 Display a 16-byte hex/ASCII dump of memory starting at address ADDR.
-Optional parameter is the number of lines to display if you want more than one. 
+Optional parameter is the number of lines to display if you want more than one.
 Usage: hexdump ADDR [nr lines]
 end
 

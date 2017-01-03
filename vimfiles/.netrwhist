@@ -1,3 +1,6 @@
 let g:netrw_dirhistmax  =10
-let g:netrw_dirhist_cnt =1
-let g:netrw_dirhist_1='c:/home/local/src/ghq/github.com/maskedw/dotfiles'
+let g:netrw_dirhist_cnt =4
+let g:netrw_dirhist_1='/mnt/hgfs/work/project/asahi-densi/AEL_BOSHI01/AEL_BOSHI01-raspberrypi.git/app'
+let g:netrw_dirhist_2='/mnt/hgfs/work/project/asahi-densi/AEL_BOSHI01/AEL_BOSHI01-raspberrypi.git/app/www'
+let g:netrw_dirhist_3='/mnt/hgfs/work/project/comtec/radar-toshiba/radar-toshiba.git/app/radar/entry_model/videotask/ui'
+let g:netrw_dirhist_4='/mnt/hgfs/winlocal/src/ghq/github.com/maskedw/picox'

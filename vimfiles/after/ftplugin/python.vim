@@ -5,4 +5,5 @@ setlocal fileformat=unix
 if ! empty(neobundle#get('jedi-vim'))
     setlocal omnifunc=jedi#completions
     setlocal completeopt-=preview
+    nnoremap <silent><buffer><C-]> :<C-u>call jedi#goto_definitions()<CR>
 endif

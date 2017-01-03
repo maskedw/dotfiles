@@ -1,0 +1,31 @@
+- hosts: 127.0.0.1
+  connection: local
+  vars:
+    download_dir: "{{ ansible_env.HOME }}/local/download"
+    src_dir: "{{ ansible_env.HOME }}/local/src"
+  tasks:
+    - name: download and build ninja
+      shell: git clone http://github.com/martine/ninja.git && cd ninja && ./bootstrap.py
+      args:
+        chdir: "{{ src_dir }}"
+        creates: "{{ src_dir }}/ninja"
+
+    - name: install ninja
+      become: yes
+      shell: cp ./ninja /usr/local/bin
+      args:
+        chdir: "{{ src_dir }}/ninja"
+        creates: "/usr/local/bin/ninja"
+
+    - name: download and build cmake
+      shell: git clone https://github.com/Kitware/CMake.git && cd CMake && ./bootstrap && make
+      args:
+        chdir: "{{ src_dir }}"
+        creates: "{{ src_dir }}/CMake"
+
+    - name: install cmake
+      become: yes
+      shell: make install
+      args:
+        chdir: "{{ src_dir }}/CMake"
+        creates: "/usr/local/bin/cmake"

@@ -1,3 +1,6 @@
+SVN
+.git
+.hg
 *.o
 *.out
 tags
@@ -27,7 +30,6 @@ tags
 *.html
 *.ctagsdb
 core.[0-9]*
-
 *.atsln
 *.atsuo
 *.cproj

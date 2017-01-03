@@ -1,13 +1,17 @@
 syntax enable
+
+set background=dark
 colorscheme hybrid
+set visualbell t_vb=
+set noerrorbells "エラーメッセージの表示時にビープを鳴らさない
 
 if has('win32') || has('win64')
     "set guifont=MeiryoKe_Console:h10.5:cSHIFTJIS
     "set guifontwide=MeiryoKe_Console:h10.5:cSHIFTJIS
     " set guifont=Consolas:h10.5:cSHIFTJIS
     " set guifontwide=Consolas:h10.5:cSHIFTJIS
-    set guifont=Consolas:h11.5:cSHIFTJIS
-    set guifontwide=Consolas:h11.5:cSHIFTJIS
+    set guifont=Consolas:h12:cSHIFTJIS
+    set guifontwide=Consolas:h12:cSHIFTJIS
 
 "起動時に最大化
     au GUIEnter * simalt ~x

@@ -2,3 +2,4 @@
     path = ~/.gitconfig.common
 [core]
     autocrlf = input
+    preloadindex = true

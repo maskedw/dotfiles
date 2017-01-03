@@ -1,42 +1,64 @@
+######################################################################
 # C/C++
-## object file
+######################################################################
 *.o
-## depend file
-*.d
-## static lib
+# ## depend file
+# *.d
+## *nix static library
 *.a
-## dynamic lib
+## *nix dynamic library
 *.so
 *.so.*
-## disassembly
+## windows  static library
+*.lib
+## windows dynamic library
+*.dll
+## disassemble
 *.dis
-## mapfile
+## map file
 *.map
-# Documets
-[Dd]oxygen/*
-[Dd]oxygen_output/*
-*/[Dd]oxygen_output/*
-
-# Dot files
-.*
-!/.local.vimrc
-!/.pyclewn.project
-!/.clang_complete
-!/.gitignore
-!/.gitmodules
-
-# Tag files
-tagfiles/*
-tags
-# cscope
+## a.out format
 *.out
+## ELF format
+*.elf
+## Intel hex format
+*.hex
+## Motorola S record format
+*.srec
 
-# Build results
+#######################################################################
+## Dot files
+#######################################################################
+.*
+.local.vimrc
+.pyclewn.project
+.clang_complete
 
-[Dd]ebug/*
-[Rr]elease/*
+#######################################################################
+## Git files
+#######################################################################
+!**/.gitignore
+!**/.gitmodules
+!**/.gitkeep
 
-# Atmel studio
+#######################################################################
+## Build directories
+#######################################################################
+**/[Dd]ebug
+**/[Rr]elease
+
+#######################################################################
+## CCS(Code Composer Studio files)
+#######################################################################
+**/.launches
+**/.settings
+!**/*.ccsproject
+!**/*.cproject
+!**/*.project
+
+#######################################################################
+## Atmel studio
+#######################################################################
 *.atsln
 *.atsuo
 *.cproj
@@ -44,13 +66,9 @@ tags
 *.srec
 *.lss
 
-# Binary
-bin/*
-*.elf
-*.hex
-*.mot
-*.bin
-## Renenas obj
+#######################################################################
+## Renesas HEW
+#######################################################################
 *.obj
 *.lib
 *.rxc
@@ -64,14 +82,16 @@ bin/*
 *.rxg
 *.ti
 
+########################################################################
+## Others
+########################################################################
+## tag file
+tags
+## cscope
+*.out
 
-
-# library
-lib/*
-
-
-# Others
-*.bak
+*.bin
+*.bak*
 *.log
 *.swp
 *.gdb

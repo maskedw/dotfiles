@@ -1,0 +1,21 @@
+syn keyword picoxStatement self priv ite
+syn keyword picoxStatement xilist_foreach xilist_rforeach
+syn keyword picoxMacro X_ASSERT X_ASSERT_MSG X_BREAK_IF X_ASSIGN_NOT_NULL
+syn keyword picoxMacro X_UNUSED X_ASSING_AND_GOTO_IF
+syn keyword picoxMacro X_LOG_VERB X_LOG_INFO X_LOG_NOTI X_LOG_WARN X_LOG_ERR
+syn keyword picoxConstant X_SEEK_SET X_SEEK_CUR X_SEEK_END
+syn keyword picoxConstant X_ERR_NONE X_ERR_IO X_ERR_INVALID X_ERR_TIMED_OUT
+syn keyword picoxConstant X_ERR_BUSY X_ERR_AGAIN X_ERR_CANCELED X_ERR_NO_MEMORY
+syn keyword picoxConstant X_ERR_EXIST X_ERR_NOT_READY X_ERR_ACCESS X_ERR_NO_ENTRY
+syn keyword picoxConstant X_ERR_NOT_SUPPORTED X_ERR_DISCONNECTED X_ERR_INPROGRESS
+syn keyword picoxConstant X_ERR_PROTOCOL X_ERR_MANY X_ERR_BROKEN X_ERR_INTERNAL
+syn keyword picoxConstant X_ERR_NAME_TOO_LONG X_ERR_RANGE X_ERR_OTHER X_ERR_UNKNOWN
+syn keyword picoxConstant X_ERR_INVALID_NAME X_ERR_IS_DIRECTORY X_ERR_NOT_DIRECTORY
+syn keyword picoxConstant X_ERR_NOT_EMPTY X_ERR_NO_SPACE
+syn keyword picoxConstant X_OPEN_MODE_READ X_OPEN_MODE_READ_PLUS
+syn keyword picoxConstant X_OPEN_MODE_WRITE X_OPEN_MODE_WRITE_PLUS
+syn keyword picoxConstant X_OPEN_MODE_APPEND X_OPEN_MODE_APPEND_PLUS
+
+highlight link picoxStatement cStatement
+highlight link picoxMacro cStatement
+highlight link picoxConstant cConstant

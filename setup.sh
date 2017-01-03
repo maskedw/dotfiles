@@ -21,16 +21,27 @@ set -o nounset                              # Treat unset variables as an error
 PWD=`pwd`
 echo $PWD
 
-TARGET=".vimrc .gvimrc .vsvimrc "
-TARGET+=".gdbinit .ctags .gitignore .gitconfig.common "
-TARGET+=".neosnippets"
+TARGET=".vimrc .gvimrc "
+TARGET+=" .bash_profile"
+TARGET+=" .gdbinit"
+TARGET+=" .ctags"
+TARGET+=" .astylerc"
+TARGET+=" .gitignore"
+TARGET+=" .gitconfig.common"
+TARGET+=" .grepignore"
+TARGET+=" .neosnippets"
+TARGET+=" .zshrc"
+TARGET+=" .tmux.conf"
+TARGET+=" .shrc"
+
 for f in $TARGET ; do
-    ln -siv $PWD/$f $HOME/$f
+    ln -sfv $PWD/$f $HOME/$f
 done
 
 TARGET=".gitconfig.unix"
+TARGET+=" .bashrc.unix"
 for f in $TARGET ; do
-    ln -siv $PWD/$f $HOME/`echo $f | sed s/\.unix//g`
+    ln -sfv $PWD/$f $HOME/`echo $f | sed s/\.unix//g`
 done
 
-ln -siv $PWD/vimfiles $HOME/.vim
+ln -sfv $PWD/vimfiles $HOME/.vim

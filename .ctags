@@ -1,19 +1,44 @@
 --exclude=doc
 --exclude=.git
+--exclude=.hg
 --exclude=.svn
+--exclude=.cache
 --exclude=lib
 --exclude=build
 --exclude=Build
 --exclude=bin
 --exclude=html
 --exclude=doxygen
+--exclude=Doxygen
 --exclude=boost
 --exclude=*.html
 --exclude=*.txt
 --exclude=*.log
 --exclude=*.bak
 --exclude=*.tmp
---langdef=wiki
 --fields=+iaS
 --extra=+fq
 --file-scope=yes
+--langdef=markdown
+--langmap=markdown:.markdown.mkd.md
+--regex-markdown=/^#[ \t]+(.*)/\. \1/h,heading1/
+--regex-markdown=/^##[ \t]+(.*)/\.\. \1/h,heading2/
+--regex-markdown=/^###[ \t]+(.*)/\.\.\. \1/h,heading3/
+--regex-markdown=/^####[ \t]+(.*)/\.\.\.\. \1/h,heading4/
+--regex-markdown=/^#####[ \t]+(.*)/\.\.\.\.\. \1/h,heading5/
+--regex-markdown=/^######[ \t]+(.*)/\.\.\.\.\.\. \1/h,heading6/
+
+--langdef=asciidoc
+--langmap=asciidoc:.ad.adoc.asciidoc
+--regex-asciidoc=/^=[ \t]+(.*)/# \1/h/
+--regex-asciidoc=/^==[ \t]+(.*)/. \1/h/
+--regex-asciidoc=/^===[ \t]+(.*)/. . \1/h/
+--regex-asciidoc=/^====[ \t]+(.*)/. . . \1/h/
+--regex-asciidoc=/^=====[ \t]+(.*)/. . . . \1/h/
+--regex-asciidoc=/^======[ \t]+(.*)/. . . . \1/h/
+--regex-asciidoc=/^=======[ \t]+(.*)/. . . . \1/h/
+--regex-asciidoc=/\[\[([^]]+)\]\]/\1/a/
+--regex-asciidoc=/^\.([^ \t].+)/\1/t/
+--regex-asciidoc=/image::([^\[]+)/\1/i/
+--regex-asciidoc=/image:([^:][^\[]+)/\1/I/
+--regex-asciidoc=/include::([^\[]+)/\1/n/

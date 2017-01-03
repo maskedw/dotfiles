@@ -1,11 +1,15 @@
 [include]
     path = ~/.gitconfig.common
 
-[core]
-    autocrlf = input
-
 [merge]
     tool = WinMerge
+
+[core]
+    # autocrlf=inputにすると、コミット時にLFに変換し、Windowsの場合はLF=>CR,LF
+    # に変換し、その他はLFのままという説明があるが、実際にやってみるとWindowsの
+    # 場合のCR,LFへの変換が動作しない。謎である。仕方ないのでWindowsでは
+    # autocrlf = true。その他ではautocrlf = inputとする。
+    autocrlf = true
 
 [mergetool "WinMerge"]
     path = WinMergeU.exe
@@ -17,4 +21,4 @@
 
 [difftool "WinMerge"]
     path = WinMergeU.exe
-    cmd = \"WinMergeU.exe\" -e -ub -dl \"Base\" -dr \"Mine\" \"$LOCAL\" \"$REMOTE\"
+    cmd = \"WinMergeU.exe\" -r -e -ub -dl \"Base\" -dr \"Mine\" \"$LOCAL\" \"$REMOTE\"
