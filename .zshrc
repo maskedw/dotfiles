@@ -1,21 +1,38 @@
-##################################################
-# System設定
-##################################################
-# セグフォの時にコアダンプを出力するための設定
-ulimit -c unlimited
-
-# 日本語設定をした後に、CUIで起動すると文字化けしてしまう。この時の環境変数TERM
-# はlinuxなので、この時は英語表記に設定する。
-# http://iwamocchan11.hatenadiary.jp/entry/2015/04/26/014616
-case $TERM in
-      linux) LANG=C ;;
-      *)     LANG=ja_JP.UTF-8;;
-esac
-
-# SSH接続時にX11Forwardingのディスプレイ設定を行う
-if [ -n "$SSH_CLIENT" ] ; then
-    export DISPLAY=`echo $SSH_CLIENT | awk '{print $1}'`:0.0
+if [ -e "$HOME/.shrc" ]; then
+    source $HOME/.shrc
 fi
+if type pyenv > /dev/null; then
+    eval "$(pyenv init -)"
+fi
+if [ -d $HOME/.pyenv/plugins/pyenv-virtualenv ]; then
+    eval "$(pyenv virtualenv-init -)"
+fi
+if type rbenv > /dev/null; then
+    eval "$(rbenv init -)"
+fi
+
+# export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3
+# export WORKON_HOME=~/.virtualenvs
+# source /usr/local/bin/virtualenvwrapper.sh
+
+# ##################################################
+# # System設定
+# ##################################################
+# # セグフォの時にコアダンプを出力するための設定
+# ulimit -c unlimited
+#
+# # 日本語設定をした後に、CUIで起動すると文字化けしてしまう。この時の環境変数TERM
+# # はlinuxなので、この時は英語表記に設定する。
+# # http://iwamocchan11.hatenadiary.jp/entry/2015/04/26/014616
+# case $TERM in
+#       linux) LANG=C ;;
+#       *)     LANG=ja_JP.UTF-8;;
+# esac
+#
+# # SSH接続時にX11Forwardingのディスプレイ設定を行う
+# if [ -n "$SSH_CLIENT" ] ; then
+#     export DISPLAY=`echo $SSH_CLIENT | awk '{print $1}'`:0.0
+# fi
 
 ##################################################
 # zsh-core-settings
@@ -58,8 +75,8 @@ zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS}
 # zsh-completions
 ##################################################
 # 補完機能を有効にする
-autoload -Uz compinit
-compinit
+# autoload -Uz compinit
+# compinit -C
 
 # 補完で小文字でも大文字にマッチさせる
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
@@ -225,48 +242,48 @@ fi
 # zsh-plugins
 ##################################################
 
-# if [ -f ~/.zplug/init.zsh ]; then
-#
-#     source ~/.zplug/init.zsh
-#
-#     # bundleやgem、vagrantといった代表的なコマンドに対する候補を表示するようになります。
-#     zplug 'zsh-users/zsh-completions'
-#
-#     # プロンプトのコマンドを色づけするプラグイン。
-#     # 実行可能とそうでないもの（コマンド名のタイポなど）で色が変わるため、操作性が大きく向上します。
-#     zplug 'zsh-users/zsh-syntax-highlighting'
-#
-#     # 簡単にgitルートへcdするやつ。
-#     zplug "mollifier/cd-gitroot"
-#
-#     # cd を強化する
-#     zplug "b4b4r07/enhancd", use:enhancd.sh
-#
-#     # pecoのようなインタラクティブフィルタツールのラッパ。
-#     # コマンド履歴の検索や、ghqで管理しているディレクトリへの移動などの便利なシェルが
-#     # 定義されているため、自分でこれらを管理する必要がなくなります。
-#     # もちろん、pecoなどをインストールしておく必要があります
-#
-#     zplug 'mollifier/anyframe'
-#
-#     # 有名なインタラクティブフィルタの一つ
-#     zplug "peco/peco", as:command, from:gh-r
-#
-#     # # 有名なインタラクティブフィルタの一つ
-#     # # またファイル名が fzf-bin となっているので file:fzf としてリネームする
-#     # zplug "junegunn/fzf-bin", as:command, from:gh-r, rename-to:fzf
-#
-#     # # ターミナル上でゴミ箱チックなことをする。fzfに依存している
-#     # zplug "b4b4r07/zsh-gomi"
-#
-#     # インストールする
-#     if ! zplug check --verbose; then
-#       printf 'Install? [y/N]: '
-#       if read -q; then
-#         echo; zplug install
-#       fi
-#     fi
-#
-#     zplug load
-#     # zplug load --verbose
-# fi
+if [ -f ~/.zplug/init.zsh ]; then
+
+    source ~/.zplug/init.zsh
+
+    # bundleやgem、vagrantといった代表的なコマンドに対する候補を表示するようになります。
+    zplug 'zsh-users/zsh-completions'
+
+    # プロンプトのコマンドを色づけするプラグイン。
+    # 実行可能とそうでないもの（コマンド名のタイポなど）で色が変わるため、操作性が大きく向上します。
+    zplug 'zsh-users/zsh-syntax-highlighting'
+
+    # 簡単にgitルートへcdするやつ。
+    zplug "mollifier/cd-gitroot"
+
+    # cd を強化する
+    zplug "b4b4r07/enhancd", use:enhancd.sh
+
+    # # pecoのようなインタラクティブフィルタツールのラッパ。
+    # # コマンド履歴の検索や、ghqで管理しているディレクトリへの移動などの便利なシェルが
+    # # 定義されているため、自分でこれらを管理する必要がなくなります。
+    # # もちろん、pecoなどをインストールしておく必要があります
+
+    # zplug 'mollifier/anyframe'
+
+    # # 有名なインタラクティブフィルタの一つ
+    # zplug "peco/peco", as:command, from:gh-r
+
+    # # # 有名なインタラクティブフィルタの一つ
+    # # # またファイル名が fzf-bin となっているので file:fzf としてリネームする
+    # # zplug "junegunn/fzf-bin", as:command, from:gh-r, rename-to:fzf
+
+    # # # ターミナル上でゴミ箱チックなことをする。fzfに依存している
+    # zplug "b4b4r07/zsh-gomi"
+
+    # インストールする
+    # if ! zplug check --verbose; then
+    #   printf 'Install? [y/N]: '
+    #   if read -q; then
+    #     echo; zplug install
+    #   fi
+    # fi
+
+    zplug load
+    # zplug load --verbose
+fi

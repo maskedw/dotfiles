@@ -3,3 +3,13 @@
 [core]
     autocrlf = input
     preloadindex = true
+
+# http://stackoverflow.com/questions/8156493/git-vimdiff-and-dirdiff
+[diff]
+  tool = default-difftool
+[difftool "default-difftool"]
+  cmd = vim -f '+next' '+execute \"DirDiff\" argv(0) argv(1)' $LOCAL $REMOTE '+syntax off'
+[merge]
+    tool = vimdiff
+[mergetool]
+    prompt = false

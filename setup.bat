@@ -1,4 +1,4 @@
-@ECHO OFF
+@echo OFF
 setlocal ENABLEDELAYEDEXPANSION
 
 set PWD=%CD%
