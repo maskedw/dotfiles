@@ -1067,6 +1067,27 @@ function! UpdatePath()
                 \ }
 endfunction
 
+function! s:python_settings()
+    if &modifiable
+        setlocal fileencoding=utf-8
+        setlocal fileformat=unix
+    endif
+endfunction
+
+function! s:html_settings()
+    if &modifiable
+        setlocal tabstop=2
+        setlocal shiftwidth=2
+        setlocal textwidth=0
+    endif
+endfunction
+
+function! s:gitcommit_settings()
+    if &modifiable
+        setlocal fileencoding=utf-8
+    endif
+endfunction
+
 function! s:cmdwin_settings()
     map <buffer> <S-CR> <CR>q:
     nnoremap <buffer> q :<C-u>quit<CR>
@@ -1317,7 +1338,13 @@ function! s:markdown_settings()
     let g:voom_tree_placement = "left"
     let g:voom_tree_height = 70
     let g:voom_tree_width = 70
-
+    if &modifiable
+        setlocal fileencoding=utf-8
+        setlocal fileformat=unix
+        setlocal textwidth=0
+        setlocal tabstop=4
+        setlocal nospell
+    endif
     " hi markdownH1   cterm=bold ctermfg=224 gui=bold guifg=#f2d8df
     " hi markdownH2   cterm=bold ctermfg=211 gui=bold guifg=#ef7585
     " hi markdownH3   cterm=bold ctermfg=224 gui=bold guifg=#efc1c4
@@ -1375,6 +1402,11 @@ Autocmd CmdwinEnter * call <SID>cmdwin_settings()
 
 AutocmdFT diff setlocal nofoldenable
 AutocmdFT ps1 setlocal omnifunc=poshcomplete#CompleteCommand
+AutocmdFT cpp setlocal suffixesadd=.hpp
+AutocmdFT python call <SID>python_settings()
+AutocmdFT html call <SID>html_settings()
+AutocmdFT gitcommit call <SID>gitcommit_settings()
+AutocmdFT make,snippet setlocal noexpandtab
 
 " quickfixウインドウで<CR>すると、該当の場所にジャンプするが、むしろジャンプし
 " てほしくない(プレビューしたい)のでジャンプしてから無理やり戻るという方法を取
