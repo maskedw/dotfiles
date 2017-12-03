@@ -8,10 +8,10 @@ set noerrorbells "エラーメッセージの表示時にビープを鳴らさ�
 if has('win32') || has('win64')
     "set guifont=MeiryoKe_Console:h10.5:cSHIFTJIS
     "set guifontwide=MeiryoKe_Console:h10.5:cSHIFTJIS
-    " set guifont=Consolas:h10.5:cSHIFTJIS
-    " set guifontwide=Consolas:h10.5:cSHIFTJIS
-    set guifont=Consolas:h12:cSHIFTJIS
-    set guifontwide=Consolas:h12:cSHIFTJIS
+    set guifont=Consolas:h11.8:cSHIFTJIS
+    set guifontwide=Consolas:h11.8:cSHIFTJIS
+    " set guifont=Source_Code_Pro:h11.5:cANSI:qDRAFT
+    " set guifontwide=MeiryoKe_Console:h11.5:cSHIFTJIS
 
 "起動時に最大化
     au GUIEnter * simalt ~x

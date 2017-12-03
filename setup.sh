@@ -33,6 +33,7 @@ TARGET+=" .neosnippets"
 TARGET+=" .zshrc"
 TARGET+=" .tmux.conf"
 TARGET+=" .shrc"
+TARGET+=" .dircolors"
 
 for f in $TARGET ; do
     ln -sfv $PWD/$f $HOME/$f

@@ -256,8 +256,10 @@ if [ -f ~/.zplug/init.zsh ]; then
     # 簡単にgitルートへcdするやつ。
     zplug "mollifier/cd-gitroot"
 
+    zplug "felixr/docker-zsh-completion"
+
     # cd を強化する
-    zplug "b4b4r07/enhancd", use:enhancd.sh
+    zplug "b4b4r07/enhancd", use:init.sh
 
     # # pecoのようなインタラクティブフィルタツールのラッパ。
     # # コマンド履歴の検索や、ghqで管理しているディレクトリへの移動などの便利なシェルが
@@ -271,19 +273,52 @@ if [ -f ~/.zplug/init.zsh ]; then
 
     # # # 有名なインタラクティブフィルタの一つ
     # # # またファイル名が fzf-bin となっているので file:fzf としてリネームする
-    # # zplug "junegunn/fzf-bin", as:command, from:gh-r, rename-to:fzf
+    # zplug "junegunn/fzf-bin", as:command, from:gh-r, rename-to:fzf
+
+    # zplug "junegunn/fzf-bin", \
+    #     from:gh-r, \
+    #     as:command, \
+    #     rename-to:fzf
 
     # # # ターミナル上でゴミ箱チックなことをする。fzfに依存している
     # zplug "b4b4r07/zsh-gomi"
 
     # インストールする
-    # if ! zplug check --verbose; then
-    #   printf 'Install? [y/N]: '
-    #   if read -q; then
-    #     echo; zplug install
-    #   fi
-    # fi
+    if ! zplug check --verbose; then
+      printf 'Install? [y/N]: '
+      if read -q; then
+        echo; zplug install
+      fi
+    fi
 
     zplug load
     # zplug load --verbose
 fi
+# [peco で man を絞り込み検索する](http://qiita.com/Linda_pp/items/9ff801aa6e00459217f7)
+function peco-man-list-all() {
+    local parent dir file
+    local paths=("${(s/:/)$(man -aw)}")
+
+    # 無理やり日本語のmanページも検索対象に含めるようにした
+    for parent in $paths; do
+    # for parent in $paths "/usr/share/man/ja"; do
+        for dir in $(/bin/ls -1 $parent); do
+            local p="${parent}/${dir}"
+            if [ -d "$p" ]; then
+                IFS=$'\n' local lines=($(/bin/ls -1 "$p"))
+                for file in $lines; do
+                    echo "${p}/${file}"
+                done
+            fi
+        done
+    done
+}
+
+function peco-man() {
+    local selected=$(peco-man-list-all | peco --prompt 'man >')
+    if [[ "$selected" != "" ]]; then
+        man -L ja "$selected"
+    fi
+}
+zle -N peco-man
+# bindkey -M viins '^ m' peco-man

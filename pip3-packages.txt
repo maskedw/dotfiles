@@ -21,3 +21,6 @@ xlrd
 toposort
 typecheck-decorator
 inflection
+better_exceptions
+selenium
+beautifulsoup4

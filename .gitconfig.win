@@ -9,7 +9,7 @@
     # に変換し、その他はLFのままという説明があるが、実際にやってみるとWindowsの
     # 場合のCR,LFへの変換が動作しない。謎である。仕方ないのでWindowsでは
     # autocrlf = true。その他ではautocrlf = inputとする。
-    autocrlf = true
+    # autocrlf = true
 
 [mergetool "WinMerge"]
     path = WinMergeU.exe

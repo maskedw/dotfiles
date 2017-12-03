@@ -134,6 +134,7 @@ syntax enable
 " Python3を有効にしておくと、has('python')はfalseを返すようになるので、そういう
 " プラグインもPython3を使ってくれる。
 let s:dammy = has('python3')
+" let s:dammy = has('python')
 
 if has('win32') || has('win64')
     " Cygwinにバックスラッシュ区切りのWindows形式パス(C:\Users\...)を渡しても警
@@ -186,17 +187,27 @@ call neobundle#load_cache()  " キャッシュの読込み
 " プラグインマネージャ。neobundle自身でneobundleの更新管理もできる。
 NeoBundleFetch 'Shougo/neobundle.vim'
 
-" 入力補完エンジン
-NeoBundle 'Shougo/neocomplete.vim'
+" [if_lua でない環境では neocomplcache を使いたい](http://rhysd.hatenablog.com/entry/2013/08/24/223438)
+function! s:meet_neocomplete_requirements()
+    return has('lua') && (v:version > 703 || (v:version == 703 && has('patch885')))
+endfunction
 
-" neocomplete vim-complete用source
-NeoBundle 'Shougo/neco-vim'
+if s:meet_neocomplete_requirements()
+    " 入力補完エンジン
+    NeoBundle 'Shougo/neocomplete.vim'
 
-" neocomplete file/include用source
-NeoBundle 'Shougo/neoinclude.vim'
+    " neocomplete vim-complete用source
+    NeoBundle 'Shougo/neco-vim'
 
-" neocomplete syntax用source
-NeoBundle 'Shougo/neco-syntax'
+    " neocomplete file/include用source
+    NeoBundle 'Shougo/neoinclude.vim'
+
+    " neocomplete syntax用source
+    NeoBundle 'Shougo/neco-syntax'
+else
+    " neocompleteの旧型
+    NeoBundle 'Shougo/neocomplcache.vim'
+endif
 
 " snippetエンジン
 NeoBundle 'Shougo/neosnippet'
@@ -302,6 +313,8 @@ NeoBundle 'elzr/vim-json'
 NeoBundle 'Glench/Vim-Jinja2-Syntax'
 " ansibleシンタックスハイライト
 NeoBundle 'pearofducks/ansible-vim'
+" Kotlinシンタックスハイライト
+NeoBundle 'udalov/kotlin-vim'
 " Doxygenシンタックスハイライト
 NeoBundle 'vim-scripts/DoxyGen-Syntax', {
     \ 'autoload' : { 'filetypes' : ['c', 'cpp'] }}
@@ -320,8 +333,11 @@ NeoBundleLazy 'lilydjwg/colorizer', {
 NeoBundleLazy 'vim-scripts/DirDiff.vim', {
     \ 'autoload' : { 'commands' : 'DirDiff' }}
 
-" diffアルゴリズムを複数から選択できる
-NeoBundle 'chrisbra/vim-diff-enhanced'
+if exists("*systemlist")
+    " diffアルゴリズムを複数から選択できる
+    NeoBundle 'chrisbra/vim-diff-enhanced'
+endif
+
 " ビジュアルモードで2つのブロックを選択して、差分を見る
 NeoBundleLazy 'AndrewRadev/linediff.vim.git', {
     \ 'autoload' : { 'commands' : 'Linediff' }}
@@ -364,7 +380,7 @@ NeoBundleLazy 'Rip-Rip/clang_complete', {
     \  }
 NeoBundleLazy 'davidhalter/jedi-vim', {
     \ 'autoload' : {
-    \     'filetypes' : 'python',
+    \     'filetypes' : ['python'],
     \    },
     \  }
 " Powershell complete
@@ -397,7 +413,7 @@ NeoBundleLazy 'vim-scripts/doxygen-support.vim', {
 NeoBundleLazy 'vim-scripts/DoxygenToolkit.vim', {
     \ 'autoload' : { 'filetypes' : ['c', 'cpp'] }}
 
-" NeoBundle 'fuenor/qfixhowm'
+NeoBundle 'fuenor/qfixhowm'
 
 " NeoBundle 'Rykka/riv.vim'
 " NeoBundle 'Rykka/InstantRst'
@@ -555,7 +571,7 @@ NeoBundleLazy 'rhysd/vim-go-impl', {
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 " VimFilerの対抗となる、シンプル系ファイラー
-" NeoBundle 'https://github.com/cocopon/vaffle.vim.git'
+" NeoBundle 'cocopon/vaffle.vim'
 
 NeoBundleSaveCache  " キャッシュの書込み
 call neobundle#end()
@@ -571,7 +587,6 @@ filetype plugin indent on
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " ファイルの探索パス
 set path&
-let g:default_path = &path
 if executable('gcc')
     " C/C++標準ライブラリの入力補完のためにGCCのデフォルトサーチパスをpathに加える。
     " C/C++の開発をしないのであればこの設定は不要。
@@ -601,6 +616,7 @@ if executable('gcc')
     " set path+=/usr/include/c++/5/backward
     " set path+=/usr/include/x86_64-linux-gnu/c++/5
 endif
+let g:default_path = &path
 
 
 " シンタックス解析を行う最大文字数。無制限にシンタックス解析を行うと、minifyされ
@@ -1065,6 +1081,17 @@ function! UpdatePath()
                 \ 'hook/quickrunex/enable' : 1,
                 \ 'hook/sweep/files': '%S:p:r',
                 \ }
+    let g:quickrun_config.ruby = {
+                \ 'tempfile': '%{tempname()}.rb',
+                \ 'hook/quickrunex/enable' : 1,
+                \   "hook/output_encode/enable" : 1,
+                \   "hook/output_encode/encoding" : "utf-8",
+                \}
+    if has('win32') || has('win64')
+        " windowsには/usr/bin/envは存在しないので、シェバンは無効にしておいた方
+        " がよい。
+        let g:quickrun_config._['hook/shebang/enable'] = 0
+    endif
 endfunction
 
 function! s:python_settings()
@@ -1079,6 +1106,7 @@ function! s:html_settings()
         setlocal tabstop=2
         setlocal shiftwidth=2
         setlocal textwidth=0
+        setlocal noexpandtab
     endif
 endfunction
 
@@ -1087,6 +1115,15 @@ function! s:gitcommit_settings()
         setlocal fileencoding=utf-8
     endif
 endfunction
+
+function! s:yaml_settings()
+    if &modifiable
+        setlocal tabstop=2
+        setlocal shiftwidth=2
+        setlocal textwidth=0
+    endif
+endfunction
+
 
 function! s:cmdwin_settings()
     map <buffer> <S-CR> <CR>q:
@@ -1098,7 +1135,7 @@ function! s:cmdwin_settings()
     " Completion.
     inoremap <buffer><expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
     setlocal nonumber
-    let b:neocomplete_sources = ['vim']
+    " let b:neocomplete_sources = ['vim']
     startinsert!
 endfunction
 
@@ -1405,6 +1442,7 @@ AutocmdFT ps1 setlocal omnifunc=poshcomplete#CompleteCommand
 AutocmdFT cpp setlocal suffixesadd=.hpp
 AutocmdFT python call <SID>python_settings()
 AutocmdFT html call <SID>html_settings()
+AutocmdFT yaml call <SID>yaml_settings()
 AutocmdFT gitcommit call <SID>gitcommit_settings()
 AutocmdFT make,snippet setlocal noexpandtab
 
@@ -1441,7 +1479,8 @@ if ! empty(neobundle#get('unite.vim'))
     let g:unite_kind_file_use_trashbox = 1
 
     " unite grepのデフォルトオプション
-    let s:grep_exclude_dirs = '--exclude-dir=.git,.hg,.bzr,.svn,boost,bin,lib '
+    " let s:grep_exclude_dirs = '--exclude-dir=.git,.hg,.bzr,.svn,boost,bin,lib '
+    let s:grep_exclude_dirs = '--exclude-dir=.*,boost,bin,lib'
     let g:unite_source_grep_default_opts = '-IinH ' . s:grep_exclude_dirs
 
     " 大文字小文字を区別しない
@@ -1617,11 +1656,12 @@ if ! empty(neobundle#get('neocomplete.vim'))
     " 現在のSourceの取得は `:echo keys(neocomplete#variables#get_sources())`
     " デフォルト: ['file', 'tag', 'neosnippet', 'vim', 'dictionary', 'omni', 'member', 'syntax', 'include', 'buffer', 'file/include']
     "
-    let g:neocomplete#sources = {
-      \ '_' : ['file', 'file/include', 'neosnippet', 'syntax', 'member', 'omni', 'buffer']
-      \ }
+    if !exists('g:neocomplete#sources')
+        let g:neocomplete#sources = {}
+    endif
 
-    AutocmdFT vim let b:neocomplete_sources = ['vim']
+    let g:neocomplete#sources._ = ['file', 'file/include', 'neosnippet', 'syntax', 'omni', 'member', 'buffer']
+    let g:neocomplete#sources.vim = ['file', 'file/include', 'neosnippet', 'syntax', 'vim', 'omni', 'member', 'buffer']
 
     " neocomplete 補完用関数
     let g:neocomplete#sources#vim#complete_functions = {
@@ -1640,6 +1680,102 @@ if ! empty(neobundle#get('neocomplete.vim'))
     " endif
 endif
 
+if ! empty(neobundle#get('neocomplcache.vim'))
+    " For snippet_complete marker.
+    if has('conceal')
+      set conceallevel=2 concealcursor=i
+    endif
+    "Note: This option must set it in .vimrc(_vimrc).  NOT IN .gvimrc(_gvimrc)!
+    " Disable AutoComplPop.
+    let g:acp_enableAtStartup = 0
+    " Use neocomplcache.
+    let g:neocomplcache_enable_at_startup = 1
+    " Use smartcase.
+    let g:neocomplcache_enable_smart_case = 1
+    " Set minimum syntax keyword length.
+    let g:neocomplcache_min_syntax_length = 3
+    let g:neocomplcache_lock_buffer_name_pattern = '\*ku\*'
+
+    " Enable heavy features.
+    " Use camel case completion.
+    "let g:neocomplcache_enable_camel_case_completion = 1
+    " Use underbar completion.
+    "let g:neocomplcache_enable_underbar_completion = 1
+
+    " Define dictionary.
+    let g:neocomplcache_dictionary_filetype_lists = {
+        \ 'default' : '',
+        \ 'vimshell' : $HOME.'/.vimshell_hist',
+        \ 'scheme' : $HOME.'/.gosh_completions'
+            \ }
+
+    " Define keyword.
+    if !exists('g:neocomplcache_keyword_patterns')
+        let g:neocomplcache_keyword_patterns = {}
+    endif
+    let g:neocomplcache_keyword_patterns['default'] = '\h\w*'
+
+    " Plugin key-mappings.
+    inoremap <expr><C-g>     neocomplcache#undo_completion()
+    inoremap <expr><C-l>     neocomplcache#complete_common_string()
+
+    " Recommended key-mappings.
+    " <CR>: close popup and save indent.
+    inoremap <silent> <CR> <C-r>=<SID>my_cr_function()<CR>
+    function! s:my_cr_function()
+      return neocomplcache#smart_close_popup() . "\<CR>"
+      " For no inserting <CR> key.
+      "return pumvisible() ? neocomplcache#close_popup() : "\<CR>"
+    endfunction
+    " <TAB>: completion.
+    inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
+    " <C-h>, <BS>: close popup and delete backword char.
+    inoremap <expr><C-h> neocomplcache#smart_close_popup()."\<C-h>"
+    inoremap <expr><BS> neocomplcache#smart_close_popup()."\<C-h>"
+    inoremap <expr><C-y>  neocomplcache#close_popup()
+    inoremap <expr><C-e>  neocomplcache#cancel_popup()
+    " Close popup by <Space>.
+    inoremap <expr><Space> pumvisible() ? neocomplcache#close_popup() : "\<Space>"
+
+    " For cursor moving in insert mode(Not recommended)
+    "inoremap <expr><Left>  neocomplcache#close_popup() . "\<Left>"
+    "inoremap <expr><Right> neocomplcache#close_popup() . "\<Right>"
+    "inoremap <expr><Up>    neocomplcache#close_popup() . "\<Up>"
+    "inoremap <expr><Down>  neocomplcache#close_popup() . "\<Down>"
+    " Or set this.
+    "let g:neocomplcache_enable_cursor_hold_i = 1
+    " Or set this.
+    "let g:neocomplcache_enable_insert_char_pre = 1
+
+    " AutoComplPop like behavior.
+    "let g:neocomplcache_enable_auto_select = 1
+
+    " Shell like behavior(not recommended).
+    "set completeopt+=longest
+    "let g:neocomplcache_enable_auto_select = 1
+    "let g:neocomplcache_disable_auto_complete = 1
+    "inoremap <expr><TAB>  pumvisible() ? "\<Down>" : "\<C-x>\<C-u>"
+
+    " Enable omni completion.
+    autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
+    autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
+    autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
+    " autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
+    autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
+
+    " Enable heavy omni completion.
+    if !exists('g:neocomplcache_force_omni_patterns')
+      let g:neocomplcache_force_omni_patterns = {}
+    endif
+    let g:neocomplcache_force_omni_patterns.php = '[^. \t]->\h\w*\|\h\w*::'
+    let g:neocomplcache_force_omni_patterns.c = '[^.[:digit:] *\t]\%(\.\|->\)'
+    let g:neocomplcache_force_omni_patterns.cpp = '[^.[:digit:] *\t]\%(\.\|->\)\|\h\w*::'
+
+    " For perlomni.vim setting.
+    " https://github.com/c9s/perlomni.vim
+    let g:neocomplcache_force_omni_patterns.perl = '\h\w*->\h\w*\|\h\w*::'
+endif
+
 
 if ! empty(neobundle#get('clang_complete'))
     let g:clang_complete_auto = 0
@@ -1647,16 +1783,19 @@ if ! empty(neobundle#get('clang_complete'))
     let g:clang_use_library = 1
 
     if has('win32') || has('win64')
-        let g:clang_library_path = "C:/llvm/bin"
+        " let g:clang_library_path = "C:/llvm/bin"
+        let g:clang_library_path = "C:/dev/llvm/bin"
         " いつもまにかWindowsだと謎のエラーがでるようになったので、この機能は
         " 使わない。
         let g:clang_snippets = 0
     else
         let g:clang_library_path = '/usr/lib'
-        " let g:clang_library_path = '/usr/lib/llvm-3.4/lib'
-        " clang本体はPython3に対応していうが、スニペット展開の部分は対応してない
-        " ・・・。
-        let g:clang_snippets = 0
+        " let g:clang_library_path = '/usr/lib/llvm-3.6/lib'
+        " clang本体はPython3に対応しているが、スニペット展開の部分は対応してない
+        " だと・・・。
+        " let g:clang_snippets = 0
+        " 2017/02/27 対応したようだ
+        let g:clang_snippets = 1
     endif
 
 
@@ -1685,8 +1824,9 @@ if empty(neobundle#get('jedi-vim'))
 else
     let g:jedi#force_py_version = 3
     let g:jedi#auto_initialization = 1
+    " let g:jedi#auto_vim_configuration = 1
     let g:jedi#auto_vim_configuration = 0
-    let g:jedi#completions_enabled = 0
+    let g:jedi#completions_enabled = 1
     let g:jedi#popup_select_first = 0
     " 1だと、入力位置上部にシグネチャがポップアップする。2だとコマンド
     " ラインウインドウに表示される。
@@ -1980,6 +2120,7 @@ if ! empty(neobundle#get('syntastic'))
     " 明示的にSyntasticCheckを呼び出した時だけ構文チェックを行う。
     let g:syntastic_mode_map = { 'mode': 'passive' }
     let g:syntastic_javascript_checkers = ['jshint']
+    let g:syntastic_yaml_checkers = ['yamllint']
 
     nnoremap         [syntastic]  <nop>
     nmap    <Space>s [syntastic]
@@ -2033,7 +2174,7 @@ if ! empty(neobundle#get('qfixhowm'))
     let g:qfixmemo_dir = '~/Dropbox/qfixmemo'
     " MRUファイル保存先
     let g:QFixMRU_Filename = g:qfixmemo_dir .'/.qfixmru'
-    let QFixHowm_DiaryFile = '~/Dropbox/qfixmemo/diary/%Y/diary-%Y-%m.howm'
+    let QFixHowm_DiaryFile = '~/Dropbox/qfixmemo/diary/%Y/diary-%Y%m%d.howm'
     "予定・TODOの検索先
     let g:QFixHowm_ScheduleSearchDir = '~/Dropbox/qfixmemo/diary'
     " MRUの基準ディレクトリ
@@ -2422,9 +2563,7 @@ endif
 
 if ! empty(neobundle#get('previm'))
     let g:previm_disable_default_css = 0
-    " let g:previm_custom_css_path = expand('~/Dropbox/tools/github.css')
-    " au BufRead,BufNewFile *.md set filetype=markdown
-    " let g:previm_open_cmd = 'open -a Firefox'
+    let g:previm_custom_css_path = expand('~/Dropbox/dev/tools/github.css')
 endif
 
 
@@ -2526,6 +2665,11 @@ if ! empty(neobundle#get('YouCompleteMe'))
     AutocmdFT c,cpp,go call s:youcompleteme_settings()
 endif
 
+if ! empty(neobundle#get('vim-ref'))
+    " language message C に設定していると、manが英語になってしまったので、コマン
+    " ド引数で日本語指定をしておく。
+    let g:ref_man_cmd = 'man -L ja -Tutf8'
+endif
 
 if ! empty(neobundle#get('vim-markdown'))
     " foldingは重すぎるので無効にしておく
@@ -2545,7 +2689,7 @@ if ! empty(neobundle#get('vim-markdown'))
     let g:vim_markdown_toml_frontmatter = 1
     let g:vim_markdown_json_frontmatter = 1
     let g:vim_markdown_new_list_item_indent = 2
-    let g:vim_markdown_fenced_languages = ['dos=dosbatch']
+    let g:vim_markdown_fenced_languages = ['dos=dosbatch', 'jinja=jinja2', 'j2=jinja2']
 else
     " 外部pluginなしでfencedブロックのシンタックスハイライトを有効にしたい時は、
     " 明示的に有効なファイルタイプを指定しておかなければならない。
