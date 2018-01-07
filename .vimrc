@@ -85,9 +85,17 @@ if !1 | finish | endif
 "   グローバルなfunctionはVim scriptの仕様として、必ず大文字から始めないといけな
 "   いという制限があるのでスネークケースは使用できないことに注意。
 
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" CORE_SETTINGS:
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " スペルチェック無効
 set nospell
+" シンタックスハイライト有効
+syntax enable
 
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" CORE_SETTINGS__LANG:
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " [Windowsで:set encoding=utf-8する方法](http://thinca.hatenablog.com/entry/20090111/1231684962)
 let $LANG='ja_JP.UTF-8'
 set encoding=utf-8
@@ -96,15 +104,29 @@ set encoding=utf-8
 " プラグインの文字エンコーディングはまず間違いなくutf-8。
 scriptencoding utf-8
 
-" 言語設定
 " vim内のメッセージを英語にする
 language message C
 " strftime()で使用する言語を英語にする
 language time C
 
-" シンタックスハイライト有効
-syntax enable
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" CORE_SETTINGS__SHELL:
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+if has('win32') || has('win64')
+    " Cygwinにバックスラッシュ区切りのWindows形式パス(C:\Users\...)を渡しても警
+    " 告を出力しないようにする環境変数の設定
+    let $CYGWIN = 'nodosfilewarning'
 
+    " Vim内でのみ追加したいPATH
+    let s:add_path = ';C:\msys64\mingw64\bin;C:\msys64\usr\bin'
+    " vimrcをリロードしても多重登録されないように初めに除去する
+    let $PATH = substitute($PATH, s:add_path, '', 'g')
+    let $PATH .= s:add_path
+endif
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" CORE_SETTINGS__OTHER:
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Python拡張の設定
 " Vim scriptは他のスクリプト言語と連携して記述することができる。Ruby, Lua, Perl,
 " Python2, 3 etc...と主要なスクリプト言語はなんでも使えるようだ。ただしVimのビル
@@ -119,16 +141,15 @@ syntax enable
 " ンと、3にしか対応していないプラグインを同時に使用できる)。
 "
 " しかし、UbuntuのVimは自分でビルドをしても、2,3を同時利用できないという問題があ
-" る。[vim-jp Debian系のLinuxでPython 2.xと3.xが同時利用できない問題の原因と対策](https://github.com/vim-jp/issues/issues/301)
-" 同時利用ができない、というのは、Vim起動後に初めに使用したPythonのバージョンし
-" か使用できないということだ。参考記事を見る限り、今後もこの制限に変わりはなさそ
-" う。
+" る。[vim-jp Debian系のLinuxでPython 2.xと3.xが同時利用できない問題の原因と対策
+" ](https://github.com/vim-jp/issues/issues/301)同時利用ができない、というのは、
+" Vim起動後に初めに使用したPythonのバージョンしか使用できないということだ。参考
+" 記事を見る限り、今後もこの制限が改善されることはなさそう。
 "
-" どちらかしか使用できないなら、基本的にはPython3を使用したい。プラグインのロー
-" ドを行うと、プラグインの実装によって、Python2, 3どちらが先に有効かされるかわか
-" らないので、プログインのロード前に、明示的にPythonバージョンを指定しておく。
-" Python拡張の有無を確認する has('python') or has('python3)を実行するだけでバー
-" ジョンが固定される。
+" プラグインのロードを行うと、プラグインの実装によって、Python2, 3どちらが先に有
+" 効かされるかわからないので、プログインのロード前に、明示的にPythonバージョンを
+" 指定しておく。Python拡張の有無を確認する has('python') or has('python3)を実行
+" するだけでバージョンが固定される。
 "
 " Python2,3両対応しているプラグインはPython2の優先度が高いものが多い。先に
 " Python3を有効にしておくと、has('python')はfalseを返すようになるので、そういう
@@ -136,17 +157,7 @@ syntax enable
 let s:dammy = has('python3')
 " let s:dammy = has('python')
 
-if has('win32') || has('win64')
-    " Cygwinにバックスラッシュ区切りのWindows形式パス(C:\Users\...)を渡しても警
-    " 告を出力しないようにする環境変数の設定
-    let $CYGWIN = 'nodosfilewarning'
-
-    " Vim内でのみ追加したいPATH
-    let s:add_path = ';C:\msys64\mingw64\bin;C:\msys64\usr\bin'
-    " vimrcをリロードしても多重登録されないように初めに除去する
-    let $PATH = substitute($PATH, s:add_path, '', 'g')
-    let $PATH .= s:add_path
-endif
+let s:is_windows = has('win32') || has('win64')
 
 augroup MyVimrc
     autocmd!
@@ -156,9 +167,8 @@ command! -nargs=* AutocmdFT autocmd MyVimrc FileType <args>
 AutocmdFT vim highlight def link myVimAutocmd vimAutocmd
 AutocmdFT vim match myVimAutocmd /\<\(Autocmd\|AutocmdFT\)\>/
 
-
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" BUNDLE_SETTINGS:
+" PLUGIN_SETTINGS:
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 if ! isdirectory(expand('~/vim.d/bundle'))
     " neobundleがインストールされていなければダウンロードする
@@ -172,7 +182,6 @@ if ! isdirectory(expand('~/vim.d/bundle'))
     endif
 endif
 
-" {{{ @neobundle
 if has('vim_starting')
     set nocompatible
     set runtimepath+=~/vim.d/bundle/neobundle.vim/
@@ -181,12 +190,12 @@ endif
 call neobundle#begin(expand('~/vim.d/bundle/'))
 call neobundle#load_cache()  " キャッシュの読込み
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-"" Plugin:Shougoシリーズ
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " プラグインマネージャ。neobundle自身でneobundleの更新管理もできる。
 NeoBundleFetch 'Shougo/neobundle.vim'
 
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" PLUGINS_CORE:
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " [if_lua でない環境では neocomplcache を使いたい](http://rhysd.hatenablog.com/entry/2013/08/24/223438)
 function! s:meet_neocomplete_requirements()
     return has('lua') && (v:version > 703 || (v:version == 703 && has('patch885')))
@@ -209,34 +218,61 @@ else
     NeoBundle 'Shougo/neocomplcache.vim'
 endif
 
-" snippetエンジン
-NeoBundle 'Shougo/neosnippet'
+" ディレクトリを遡って.lvimrcを自動的に読み込む
+NeoBundle 'embear/vim-localvimrc'
 
-" neosnippet用snippet詰め合わせ
-NeoBundle 'Shougo/neosnippet-snippets'
+" スニペットエンジン
+NeoBundle 'SirVer/ultisnips'
+NeoBundle 'honza/vim-snippets'
+
+" YouCompleteMeとの親和性を重視して、ultisnipsに乗り換えた
+" " snippetエンジン
+" NeoBundle 'Shougo/neosnippet'
+"
+" " neosnippet用snippet詰め合わせ
+" NeoBundle 'Shougo/neosnippet-snippets'
 
 " 汎用選択インターフェース
 NeoBundle 'Shougo/unite.vim'
 
-" unite用各種ソース
-NeoBundle 'Shougo/unite-outline'
-NeoBundle 'ujihisa/unite-colorscheme'
-NeoBundle 'ujihisa/unite-font'
-NeoBundle 'tsukkee/unite-help'
-" NeoBundle 'tsukkee/unite-tag'
-" NeoBundle 'thinca/vim-unite-history'
-" NeoBundle 'osyo-manga/unite-quickfix'
-" NeoBundle 'sgur/unite-everything'
-" NeoBundle 'rhysd/unite-locate'
-" NeoBundle 'rhysd/quickrun-unite-quickfix-outputter'
-" NeoBundle 'sorah/unite-ghq'
-" NeoBundle 'rhysd/unite-codic.vim'
+" 非同期lint実行
+NeoBundleLazy "w0rp/ale", {
+    \ 'autoload' : {
+    \     'filetypes' : ['c', 'cpp', 'go', 'python', 'sh', 'yaml', 'ansible'],
+    \    },
+    \  }
 
-" unite file_mru用source
-NeoBundle 'Shougo/neomru.vim'
+if ! s:is_windows
+    " クロスリファレンスとかをするすごいやつ
+    " Windowsではビルドが難しい
+    NeoBundleLazy 'lyuts/vim-rtags', {
+        \ 'autoload' : {
+        \     'filetypes' : ['c', 'cpp'],
+        \    },
+        \  }
+endif
+
+if ! empty(neobundle#get('unite.vim'))
+    " unite用各種ソース
+    " NeoBundle 'Shougo/unite-outline'
+    NeoBundle 'ujihisa/unite-colorscheme'
+    NeoBundle 'ujihisa/unite-font'
+    NeoBundle 'tsukkee/unite-help'
+    " NeoBundle 'tsukkee/unite-tag'
+    " NeoBundle 'thinca/vim-unite-history'
+    " NeoBundle 'osyo-manga/unite-quickfix'
+    " NeoBundle 'sgur/unite-everything'
+    " NeoBundle 'rhysd/unite-locate'
+    " NeoBundle 'rhysd/quickrun-unite-quickfix-outputter'
+    " NeoBundle 'sorah/unite-ghq'
+    " NeoBundle 'rhysd/unite-codic.vim'
+    "" unite file_mru用source
+    " NeoBundle 'Shougo/neomru.vim'
+endif
 
 " バイナリエディタ
-NeoBundle 'Shougo/vinarise'
+NeoBundleLazy 'Shougo/vinarise', {
+    \ 'autoload' : { 'commands' : 'Vinarise' }}
 
 " 非同期インターフェース
 NeoBundle 'Shougo/vimproc', {
@@ -269,9 +305,9 @@ NeoBundleLazy 'Shougo/vimfiler.vim', {
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-"" Plugin:見た目(カラーテーマとかシンタックスハイライトとか)
+" PLUGINS__APPEARANCE:
+" カラーテーマとかシンタックスハイライトとか
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
 " 愛用しているかっちょいいカラーテーマ
 NeoBundle 'w0ng/vim-hybrid'
 
@@ -320,14 +356,14 @@ NeoBundle 'vim-scripts/DoxyGen-Syntax', {
     \ 'autoload' : { 'filetypes' : ['c', 'cpp'] }}
 
 " CSSカラー
-" テキストファイル中のカラーコードっぽいものをカラー表示する。ただしめちゃ重い。
+" テキストファイル中のカラーコードっぽいものをカラー表示する。ただし
 " このプラグインは結構重い。数万行のファイルを開こうとすると数秒かかる
 NeoBundleLazy 'lilydjwg/colorizer', {
     \ 'autoload' : {'filetypes' : ['html', 'css']}
     \ }
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Plugin:diff
+" PLUGINS__DIFFTOOL:
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " ディレクトリ単位の比較
 NeoBundleLazy 'vim-scripts/DirDiff.vim', {
@@ -343,7 +379,7 @@ NeoBundleLazy 'AndrewRadev/linediff.vim.git', {
     \ 'autoload' : { 'commands' : 'Linediff' }}
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Plugin:git
+" PLUGINS__GIT:
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " メインとなる強力なGit Plugin。Gstatusが主力
 NeoBundle 'tpope/vim-fugitive'
@@ -354,6 +390,7 @@ NeoBundle 'cohama/agit.vim'
 " カレントバッファにHEADとの差分を表示する
 NeoBundle 'airblade/vim-gitgutter'
 
+" Gitのマージ支援
 NeoBundle 'idanarye/vim-merginal'
 
 " git add -p拡張
@@ -373,25 +410,39 @@ NeoBundle 'idanarye/vim-merginal'
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Plugin:入力補完
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-NeoBundleLazy 'Rip-Rip/clang_complete', {
-    \ 'autoload' : {
-    \     'filetypes' : ['c', 'cpp'],
-    \    },
-    \  }
-NeoBundleLazy 'davidhalter/jedi-vim', {
-    \ 'autoload' : {
-    \     'filetypes' : ['python'],
-    \    },
-    \  }
+if s:is_windows
+    " C/C++入力補完エンジン。 neocompleteと連携できる
+    NeoBundleLazy 'Rip-Rip/clang_complete', {
+        \ 'autoload' : {
+        \     'filetypes' : ['c', 'cpp'],
+        \    },
+        \  }
+else
+    " windowsにも頑張ったらインストールできるみたいだけど、めんどいのでやってない
+    NeoBundleLazy "Valloric/YouCompleteMe", {
+        \ 'autoload' : {
+        \     'filetypes' : ['c', 'cpp', 'go', 'python'],
+        \    },
+        \  }
+    " YouCompleteMeで補完した時に、引数名とかも展開する
+    NeoBundle 'tenfyzhong/CompleteParameter.vim'
+
+    " https://github.com/vim-jp/issues/issues/1137
+    set shortmess+=c
+endif
+
+" YouComleteMeの前にロードしておかないと期待どおり動いてくれなかった。メンドイの
+" でLazyはなしで。
+"" Pythonの入力補完エンジン
+"" NeoBundleLazy 'davidhalter/jedi-vim', {
+""     \ 'autoload' : {
+""     \     'filetypes' : ['python'],
+""     \    },
+""     \  }
+NeoBundle 'davidhalter/jedi-vim'
 " Powershell complete
 " NeoBundle 'cd01/poshcomplete-vim'
 
-" C/C++, C#, Python, Go, Javascript complete
-" NeoBundleLazy "Valloric/YouCompleteMe", {
-"     \ 'autoload' : {
-"     \     'filetypes' : ['go', 'javascript'],
-"     \    },
-"     \  }
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " @plugin:ファイル操作
@@ -450,10 +501,10 @@ NeoBundle 'h1mesuke/vim-alignta'
 " NeoBundle 'junegunn/vim-easy-align'
 
 " 日本語を禁則処理とかも踏まえてええ感じに整形する
-" NeoBundle 'fuenor/JpFormat.vim'
+NeoBundle 'fuenor/JpFormat.vim'
 
 " Markdownのリスト表示をディレクトリツリーぽい表示に整形できる
-NeoBundle 'shinespark/vim-list2tree'
+" NeoBundle 'shinespark/vim-list2tree'
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Plugin:カーソルとかウインドウ操作
@@ -569,9 +620,22 @@ NeoBundleLazy 'rhysd/vim-go-impl', {
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Plugin:様子見中
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
 " VimFilerの対抗となる、シンプル系ファイラー
 " NeoBundle 'cocopon/vaffle.vim'
+
+" 範囲選択してOpenGoogleTranslateでGoogle翻訳を開く
+NeoBundle 'haya14busa/vim-open-googletranslate'
+
+NeoBundle 'Shougo/context_filetype.vim'
+NeoBundle 'osyo-manga/vim-precious'
+
+" 操作性悪すぎるんで素直にIDEを使ったほうがいいですね・・・
+" " VimでGDBやPDBによるデバッグができる
+" NeoBundle 'idanarye/vim-vebugger'
+
+" QuickFixウインドウでプレビューを行う
+NeoBundle 'ronakg/quickr-preview.vim'
+
 
 NeoBundleSaveCache  " キャッシュの書込み
 call neobundle#end()
@@ -911,13 +975,13 @@ noremap j gj
 noremap k gk
 
 " Shift-hjklでウィンドウサイズ調整
-nnoremap <S-j> <C-w>10-
-nnoremap <S-k> <C-w>10+
+nnoremap <S-j> <C-w>5-
+nnoremap <S-k> <C-w>5+
 nnoremap <S-l> <C-w>10>
 nnoremap <S-h> <C-w>10<
 " Shift + カーソルキーでのウィンドウサイズ変更
-nnoremap <silent><S-Down>  <C-w>10-
-nnoremap <silent><S-Up>    <C-w>10+
+nnoremap <silent><S-Down>  <C-w>5-
+nnoremap <silent><S-Up>    <C-w>5+
 nnoremap <silent><S-Left>  <C-w>10<
 nnoremap <silent><S-Right> <C-w>10>
 
@@ -1012,13 +1076,19 @@ nnoremap <silent>[cscope]f :<C-u>cs find f <C-R>=expand("<cfile>")<CR><CR>
 nnoremap <silent>[cscope]i :<C-u>cs find i ^<C-R>=expand("<cfile>")<CR>$<CR>
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" FUNCTIONS: 汎用
+" FUNCTIONS__GLOBAL:
+" 外部呼び出し可能な関数は大文字で始める、というのがVimScriptのルール
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " pathが存在していればpathをsourceコマンドで実行する
 function! SourceIfExist(path)
     if filereadable(a:path)
         execute 'source' a:path
     endif
+endfunction
+
+function! GetLVimRCDir(basedir)
+    let lvimrc = findfile('.lvimrc', escape(a:basedir, ' ') . ';')
+    return fnamemodify(lvimrc, ':h')
 endfunction
 
 " 文字列の前後から空白(改行も含む)を除去して返す
@@ -1094,62 +1164,42 @@ function! UpdatePath()
     endif
 endfunction
 
-function! s:python_settings()
-    if &modifiable
-        setlocal fileencoding=utf-8
-        setlocal fileformat=unix
+
+" WindowsのGCCとかがSJISの出力をする時にUTF-8に変換する用
+" let $LANG='ja_JP.UTF-8'でLANG設定をするようにしたからもう不要か？
+function! QfMakeConv()
+    let qflist = getqflist()
+    for i in qflist
+        let i.text = iconv(i.text, "sjis", "utf-8")
+    endfor
+    call setqflist(qflist)
+endfunction
+
+
+function! CustomFoldText()
+    " 折り畳みの n 行:という表記は個人的に目障りなので除去する
+    let ret = substitute(foldtext(), '- \+[0-9]\+ 行:', '- ', '')
+    return ret
+endfunction
+
+" git のルートディレクトリを返す
+function! GitRootDir()
+    if(s:is_git_dir())
+        let l:gitdir = system('git rev-parse --show-toplevel')
+        let l:gitdir= substitute(l:gitdir, '\r\n', '', 'g')
+        let l:gitdir= substitute(l:gitdir, '\n', '', 'g')
+        return l:gitdir
+    else
+        echoerr 'current directory is outside git working tree'
     endif
 endfunction
 
-function! s:html_settings()
-    if &modifiable
-        setlocal tabstop=2
-        setlocal shiftwidth=2
-        setlocal textwidth=0
-        setlocal noexpandtab
-    endif
-endfunction
-
-function! s:gitcommit_settings()
-    if &modifiable
-        setlocal fileencoding=utf-8
-    endif
-endfunction
-
-function! s:yaml_settings()
-    if &modifiable
-        setlocal tabstop=2
-        setlocal shiftwidth=2
-        setlocal textwidth=0
-    endif
-endfunction
-
-
-function! s:cmdwin_settings()
-    map <buffer> <S-CR> <CR>q:
-    nnoremap <buffer> q :<C-u>quit<CR>
-    "nnoremap <buffer> <TAB> :<C-u>quit<CR>
-    inoremap <buffer><expr><CR> pumvisible() ? "\<C-y>\<CR>" : "\<CR>"
-    inoremap <buffer><expr><C-h> pumvisible() ? "\<C-y>\<C-h>" : "\<C-h>"
-    inoremap <buffer><expr><BS> pumvisible() ? "\<C-y>\<C-h>" : "\<C-h>"
-    " Completion.
-    inoremap <buffer><expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
-    setlocal nonumber
-    " let b:neocomplete_sources = ['vim']
-    startinsert!
-endfunction
-
-if has('win32') || has('win64')
-    function! QfMakeConv()
-       let qflist = getqflist()
-       for i in qflist
-          let i.text = iconv(i.text, "sjis", "utf-8")
-       endfor
-       call setqflist(qflist)
-    endfunction
-    Autocmd QuickfixCmdPost make call QfMakeConv()
-endif
-
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" FUNCTIONS__LOCAL:
+" ローカル関数はs:小文字始まり
+" コールバックとかから呼び出すときはこんな感じで書く
+" <SID>function_name()
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 function! s:toggle_fullscreen()
   if &guioptions =~# 'C'
     set guioptions-=C
@@ -1243,18 +1293,6 @@ function! s:is_git_dir()
     return system('git rev-parse --is-inside-work-tree') ==# "true\n"
 endfunction
 
-" git のルートディレクトリを返す
-function! GitRootDir()
-    if(s:is_git_dir())
-        let l:gitdir = system('git rev-parse --show-toplevel')
-        let l:gitdir= substitute(l:gitdir, '\r\n', '', 'g')
-        let l:gitdir= substitute(l:gitdir, '\n', '', 'g')
-        return l:gitdir
-    else
-        echoerr 'current directory is outside git working tree'
-    endif
-endfunction
-
 function! s:add_permission_x()
     let file = expand('%:p')
     if getline(1) =~# '^#!' && !executable(file)
@@ -1291,13 +1329,6 @@ function! s:delete_current_buf()
     bnext
     if bufnr == bufnr('%') | enew | endif
     silent! bdelete #
-endfunction
-
-
-function! CustomFoldText()
-    " 折り畳みの n 行:という表記は個人的に目障りなので除去する
-    let ret = substitute(foldtext(), '- \+[0-9]\+ 行:', '- ', '')
-    return ret
 endfunction
 
 function! s:get_syn_id(transparent)
@@ -1337,8 +1368,90 @@ function! s:get_syn_info()
         \ " guibg: " . linkedSyn.guibg
 endfunction
 
+function! s:rtrim()
+    " 保存時に行末の空白を除去する。ただし、markdownの場合は行末の空白に意味があ
+    " るので除去しない。
+    let s:cursor = getpos(".")
+    if &filetype == "markdown"
+        %s/\s\+\(\s\{2}\)$/\1/e
+    else
+        %s/\s\+$//e
+    endif
+    call setpos(".", s:cursor)
+endfunction
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" FUNCTION__FILETYPE_SETTINGS:
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+function! s:markdown_settings()
+    nnoremap <buffer><Space>tt :<C-u>VoomToggle markdown<CR>
+    " let g:voom_tree_placement = "top"
+    let g:voom_tree_placement = "left"
+    let g:voom_tree_height = 70
+    let g:voom_tree_width = 70
+    if &modifiable
+        setlocal fileencoding=utf-8
+        setlocal fileformat=unix
+        setlocal textwidth=0
+        setlocal tabstop=4
+        setlocal nospell
+    endif
+    " hi markdownH1   cterm=bold ctermfg=224 gui=bold guifg=#f2d8df
+    " hi markdownH2   cterm=bold ctermfg=211 gui=bold guifg=#ef7585
+    " hi markdownH3   cterm=bold ctermfg=224 gui=bold guifg=#efc1c4
+    " hi markdownH4   cterm=bold ctermfg=226 gui=bold guifg=#ffff00
+    " hi markdownH5   cterm=bold ctermfg=46 gui=bold guifg=#00ff00
+    " hi markdownH6   cterm=bold ctermfg=46 gui=bold guifg=#00ff00
+endfunction
+
+function! s:python_settings()
+    if &modifiable
+        setlocal fileencoding=utf-8
+        setlocal fileformat=unix
+    endif
+endfunction
+
+function! s:html_settings()
+    if &modifiable
+        setlocal tabstop=2
+        setlocal shiftwidth=2
+        setlocal textwidth=0
+        setlocal noexpandtab
+    endif
+endfunction
+
+function! s:gitcommit_settings()
+    if &modifiable
+        setlocal fileencoding=utf-8
+    endif
+endfunction
+
+function! s:yaml_settings()
+    if &modifiable
+        setlocal tabstop=2
+        setlocal shiftwidth=2
+        setlocal textwidth=0
+    endif
+endfunction
+
+function! s:cmdwin_settings()
+    map <buffer> <S-CR> <CR>q:
+    nnoremap <buffer> q :<C-u>quit<CR>
+    "nnoremap <buffer> <TAB> :<C-u>quit<CR>
+    inoremap <buffer><expr><CR> pumvisible() ? "\<C-y>\<CR>" : "\<CR>"
+    inoremap <buffer><expr><C-h> pumvisible() ? "\<C-y>\<C-h>" : "\<C-h>"
+    inoremap <buffer><expr><BS> pumvisible() ? "\<C-y>\<C-h>" : "\<C-h>"
+    " Completion.
+    inoremap <buffer><expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
+    setlocal nonumber
+    " let b:neocomplete_sources = ['vim']
+    startinsert!
+endfunction
+
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " COMMANDS:
+" コマンドってのはノーマルモードから:echo
+" とかで呼び出せるものを指す。これも大文字始まりでなければならない。
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 command! -nargs=? -complete=dir -bang CD  call s:chdir('<args>', '<bang>')
 " カーソル下のハイライトグループを取得
@@ -1368,28 +1481,6 @@ command! ToggleRelativeNumberOption     call <SID>toggle_relative_number_option(
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " AUTO_COMMANDS:
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Vimrc augroup
-function! s:markdown_settings()
-    nnoremap <buffer><Space>tt :<C-u>VoomToggle markdown<CR>
-    " let g:voom_tree_placement = "top"
-    let g:voom_tree_placement = "left"
-    let g:voom_tree_height = 70
-    let g:voom_tree_width = 70
-    if &modifiable
-        setlocal fileencoding=utf-8
-        setlocal fileformat=unix
-        setlocal textwidth=0
-        setlocal tabstop=4
-        setlocal nospell
-    endif
-    " hi markdownH1   cterm=bold ctermfg=224 gui=bold guifg=#f2d8df
-    " hi markdownH2   cterm=bold ctermfg=211 gui=bold guifg=#ef7585
-    " hi markdownH3   cterm=bold ctermfg=224 gui=bold guifg=#efc1c4
-    " hi markdownH4   cterm=bold ctermfg=226 gui=bold guifg=#ffff00
-    " hi markdownH5   cterm=bold ctermfg=46 gui=bold guifg=#00ff00
-    " hi markdownH6   cterm=bold ctermfg=46 gui=bold guifg=#00ff00
-endfunction
-
 " Markdown
 Autocmd BufRead,BufNewFile *.md,*.markdown,*.mkd setlocal ft=markdown | call <SID>markdown_settings()
 " tmux
@@ -1417,18 +1508,7 @@ Autocmd BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$") | exe "norm
 Autocmd BufWritePost * if expand('%') != '' && &buftype !~ 'nofile' | mkview | endif
 Autocmd BufRead * if expand('%') != '' && &buftype !~ 'nofile' | silent loadview | endif
 
-function! s:rtrim()
-    " 保存時に行末の空白を除去する。ただし、markdownの場合は行末の空白に意味があ
-    " るので除去しない。
-    let s:cursor = getpos(".")
-    if &filetype == "markdown"
-        %s/\s\+\(\s\{2}\)$/\1/e
-    else
-        %s/\s\+$//e
-    endif
-    call setpos(".", s:cursor)
-endfunction
-
+" 保存時に行末の空白を除去する
 Autocmd BufWritePre * call <SID>rtrim()
 
 Autocmd BufRead,BufNewFile *.dis set filetype=cmix
@@ -1445,6 +1525,25 @@ AutocmdFT html call <SID>html_settings()
 AutocmdFT yaml call <SID>yaml_settings()
 AutocmdFT gitcommit call <SID>gitcommit_settings()
 AutocmdFT make,snippet setlocal noexpandtab
+" ALEとかのシンタックスチェッカーにAnsibleとYAMLの両方のチェッカーを使いたいので
+" 複合ファイルタイプを設定する
+AutocmdFT ansible setlocal ft=ansible.yaml
+" スクリプトに実行可能属性を自動で付ける
+if executable('chmod')
+    Autocmd BufWritePost * call s:add_permission_x()
+endif
+
+if has('win32') || has('win64')
+    Autocmd QuickfixCmdPost make call QfMakeConv()
+endif
+" voomtree(アウトラインビュー)でアウトラインにたいして<CR>を入力すると、プレ
+" ビューされるが、カーソル移動するだけでプレビューしてほしいので、以下のマッピン
+" グをする。
+AutocmdFT voomtree nmap <buffer> <C-j> j<CR>
+AutocmdFT voomtree nmap <buffer> <C-k> k<CR>
+
+" QuickFixウインドウをqで閉じる
+AutocmdFT qf nnoremap <silent> q :<C-u>quit<CR>
 
 " quickfixウインドウで<CR>すると、該当の場所にジャンプするが、むしろジャンプし
 " てほしくない(プレビューしたい)のでジャンプしてから無理やり戻るという方法を取
@@ -1455,18 +1554,6 @@ AutocmdFT make,snippet setlocal noexpandtab
 " Autocmd BufReadPost quickfix nnoremap <buffer><silent> <C-j>    j<CR>:copen<CR>
 " Autocmd BufReadPost quickfix nnoremap <buffer><silent> <C-k>    k<CR>:copen<CR>
 " Autocmd BufReadPost quickfix nnoremap <buffer><silent> <CR>     <CR>:copen<CR>
-
-" voomtree(アウトラインビュー)でアウトラインにたいして<CR>を入力すると、プレ
-" ビューされるが、カーソル移動するだけでプレビューしてほしいので、以下のマッピン
-" グをする。
-AutocmdFT voomtree nmap <buffer> <C-j> j<CR>
-AutocmdFT voomtree nmap <buffer> <C-k> k<CR>
-
-" スクリプトに実行可能属性を自動で付ける
-if executable('chmod')
-    Autocmd BufWritePost * call s:add_permission_x()
-endif
-
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " PLUGIN_SETTINGS:
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -1487,6 +1574,12 @@ if ! empty(neobundle#get('unite.vim'))
     let g:unite_enable_ignore_case = 1
     let g:unite_enable_smart_case = 1
 
+    if executable('pt')
+      let g:unite_source_grep_command = 'pt'
+      let g:unite_source_grep_default_opts = '--nogroup --nocolor'
+      let g:unite_source_grep_recursive_opt = ''
+    endif
+
     nnoremap         [unite]  <nop>
     nmap    <Space>u [unite]
 
@@ -1497,14 +1590,18 @@ if ! empty(neobundle#get('unite.vim'))
     " grep検索
     nnoremap [unite]g      :<C-u>Unite grep:. -sync -no-start-insert -no-empty -horizontal -direction=botright -winheight=10<CR>
 
+    " .lvimrcを起点にしたGrep
+    nnoremap [unite]G      :<C-u>execute 'Unite grep:'.GetLVimRCDir(expand('<afile>:p:h')).' -sync -no-start-insert -no-empty -horizontal -direction=botright -winheight=10'<CR>
+
     " メモgrep検索
     nnoremap [unite]m      :<C-u>execute 'Unite grep:'.expand('~/Dropbox/dev-mem').' -sync -no-start-insert -no-empty -horizontal -direction=botright -winheight=10'<CR>
+
 
     " ghq
     nnoremap [unite]q      :<C-u>Unite -no-empty -start-insert -default-action=vimfiler ghq directory_mru<CR>
 
-    " Git のルートディレクトリを開く
-    nnoremap <expr>[unite]G  ":\<C-u>Unite file -input=".fnamemodify(GitRootDir(),":p")
+    " " Git のルートディレクトリを開く
+    " nnoremap <expr>[unite]G  ":\<C-u>Unite file -input=".fnamemodify(GitRootDir(),":p")
 
     " バッファ一覧
     " nnoremap [unite]b       :<C-u>Unite -immediately -no-empty -horizontal -direction=botright -winheight=10 -auto-preview buffer<CR>
@@ -1660,24 +1757,23 @@ if ! empty(neobundle#get('neocomplete.vim'))
         let g:neocomplete#sources = {}
     endif
 
-    let g:neocomplete#sources._ = ['file', 'file/include', 'neosnippet', 'syntax', 'omni', 'member', 'buffer']
-    let g:neocomplete#sources.vim = ['file', 'file/include', 'neosnippet', 'syntax', 'vim', 'omni', 'member', 'buffer']
+    " let g:neocomplete#sources._ = ['file', 'file/include', 'neosnippet', 'syntax', 'omni', 'member', 'buffer']
+    " let g:neocomplete#sources.vim = ['file', 'file/include', 'neosnippet', 'syntax', 'vim', 'omni', 'member', 'buffer']
+    let g:neocomplete#sources._ = ['file', 'file/include', 'ultisnips', 'syntax', 'omni', 'member', 'buffer']
+    let g:neocomplete#sources.vim = ['file', 'file/include', 'ultisnips', 'syntax', 'vim', 'omni', 'member', 'buffer']
 
     " neocomplete 補完用関数
     let g:neocomplete#sources#vim#complete_functions = {
         \ 'Unite' : 'unite#complete_source',
-        \ 'VimShellExecute' : 'vimshell#vimshell_execute_complete',
-        \ 'VimShellInteractive' : 'vimshell#vimshell_execute_complete',
-        \ 'VimShellTerminal' : 'vimshell#vimshell_execute_complete',
-        \ 'VimShell' : 'vimshell#complete',
         \ 'VimFiler' : 'vimfiler#complete',
         \}
 
     " YouCompleteMeがインストールされている時は、特定の言語の時にneocompleを
     " Disableにする
-    " if ! empty(neobundle#get('YouCompleteMe'))
-    "     AutocmdFT c,cpp,go, NeoCompleteLock
-    " endif
+    if ! empty(neobundle#get('YouCompleteMe'))
+        AutocmdFT c,cpp,go,python NeoCompleteLock
+        Autocmd BufLeave c,cpp,go,python NeoCompleteUnlock
+    endif
 endif
 
 if ! empty(neobundle#get('neocomplcache.vim'))
@@ -1800,7 +1896,9 @@ if ! empty(neobundle#get('clang_complete'))
 
 
     let g:clang_complete_macros = 1
-    let g:clang_auto_user_options = ".clang_complete, path"
+    " let g:clang_auto_user_options = ".clang_complete, path"
+    let g:clang_auto_user_options = ".clang_complete, path, compile_commands.json"
+    " let g:clang_auto_user_options = "compile_commands.json"
     let g:clang_snippets_engine = 'clang_complete'
     let g:clang_trailing_placeholder = 1
     let g:clang_use_snipmate = 0
@@ -1814,7 +1912,11 @@ if ! empty(neobundle#get('clang_complete'))
     function! s:clang_complete_settings()
         " デフォルトのタグジャンプキーバインドを置き換える
         nnoremap <silent><buffer> <C-]>   :<C-u>call ClangGotoDeclaration()<CR>
-        inoremap <silent><buffer> <S-tab> <ESC>:<C-u>python updateSnips()<CR>
+        if has('python3')
+            inoremap <silent><buffer> <S-tab> <ESC>:<C-u>python3 updateSnips()<CR>
+        else
+            inoremap <silent><buffer> <S-tab> <ESC>:<C-u>python updateSnips()<CR>
+        endif
     endfunction
     AutocmdFT c,cpp call s:clang_complete_settings()
 endif
@@ -1828,6 +1930,8 @@ else
     let g:jedi#auto_vim_configuration = 0
     let g:jedi#completions_enabled = 1
     let g:jedi#popup_select_first = 0
+    let g:jedi#show_call_signatures_delay = 100
+    set noshowmode
     " 1だと、入力位置上部にシグネチャがポップアップする。2だとコマンド
     " ラインウインドウに表示される。
     let g:jedi#show_call_signatures = "2"
@@ -2000,10 +2104,11 @@ if ! empty(neobundle#get('ctrlp.vim'))
     let g:ctrlp_mruf_max            = 5000 " MRUの最大記録数
     let g:ctrlp_regexp = 1
     let g:ctrlp_match_window = 'bottom,order:btt,min:1,max:15,results:15'
+    let g:ctrlp_root_markers = ['.git', '.lvimrc']
 
     nnoremap          [ctrlp]  <nop>
     nmap     <C-p>    [ctrlp]
-    nnoremap <silent> [ctrlp]<C-p>    :<C-u>CtrlP<CR>
+    nnoremap <silent> [ctrlp]<C-p>    :<C-u>CtrlPCurWD<CR>
     nnoremap <silent> [ctrlp]<C-b>    :<C-u>CtrlPBuffer<CR>
     nnoremap <silent> [ctrlp]<C-m>    :<C-u>CtrlPMRU<CR>
     nnoremap <silent> [ctrlp]<C-r>    :<C-u>CtrlPRoot<CR>
@@ -2097,7 +2202,7 @@ if ! empty(neobundle#get('vim-easymotion'))
 endif
 
 if ! empty(neobundle#get('syntastic'))
-    let g:syntastic_debug = 0
+    let g:syntastic_debug = 1
     "let g:syntastic_aggregate_errors = 1
     let g:syntastic_always_populate_loc_list = 1
     let g:syntastic_auto_loc_list = 1
@@ -2117,10 +2222,11 @@ if ! empty(neobundle#get('syntastic'))
     let g:syntastic_python_python_exe = 'python3'
     let g:syntastic_python_checkers=['flake8']
     let g:syntastic_python_flake8_args = '--ignore="E221"'
+    let g:syntastic_ansible_checkers=['yamllint', 'ansible_lint']
     " 明示的にSyntasticCheckを呼び出した時だけ構文チェックを行う。
     let g:syntastic_mode_map = { 'mode': 'passive' }
     let g:syntastic_javascript_checkers = ['jshint']
-    let g:syntastic_yaml_checkers = ['yamllint']
+    " let g:syntastic_yaml_checkers = ['yamllint']
 
     nnoremap         [syntastic]  <nop>
     nmap    <Space>s [syntastic]
@@ -2189,6 +2295,7 @@ if ! empty(neobundle#get('qfixhowm'))
     " preview機能とかはかなり便利なのだが、プラグインを色々と入れだすと競合して
     " トラブルことが多い。よってqfixhowm機能利用時のみ有効としておく。
     let g:QFixWin_EnableMode = 3
+
     " QuickFixウィンドウでプレビューを有効にする
     let g:QFix_PreviewEnable = 1
     " QuickFixウィンドウではなくロケーションリストを使用する or しない
@@ -2581,7 +2688,9 @@ if ! empty(neobundle#get('lightline.vim'))
         \   'right': [ [ 'lineinfo' ],
         \              [ 'bufnum' ],
         \              [ 'percent' ] ]
-        \ }
+        \ },
+        \ 'separator': { 'left': '', 'right': '' },
+        \ 'subseparator': { 'left': '', 'right': '' }
         \ }
 
     let g:lightline.component = {
@@ -2642,27 +2751,90 @@ if ! empty(neobundle#get('vim-gitgutter'))
 endif
 
 if ! empty(neobundle#get('YouCompleteMe'))
-    " デフォルトのYCM設定
-    let g:ycm_global_ycm_extra_conf = expand('~/.ycm_extra_conf.py')
-    " .ycm_extran_conf.py
-    let g:ycm_confirm_extra_conf = 0
-    let g:ycm_always_populate_location_list = 1
-    let g:ycm_auto_trigger = 1
-    let g:ycm_complete_in_comments = 1
-    let g:ycm_complete_in_strings = 1
+    let g:ycm_min_num_of_chars_for_completion = 1
 
+  let g:ycm_python_binary_path = '/usr/bin/python3'
+    " セマンティック補完候補の最大表示数 (default: 50)
+    let g:ycm_max_num_candidates = 50
+
+    " 説明を見てもよくわからん (default: 10)
+    let g:ycm_max_num_identifier_candidates = 10
+
+    " '.', '->'とかで自動的に補完を開始する (default: 1)
+    let g:ycm_auto_trigger = 1
+
+    " 補完を行うファイルタイプ
     let g:ycm_filetype_whitelist = {
         \ 'c': 1,
         \ 'cpp': 1,
         \ 'go': 1,
+        \ 'python': 1,
         \}
+
+
+    " ソースコードのsyntaxチェックを行うかどうか (default: 1)
+    " syntaxチェック'w0rp/ale'で行うのでYouCompleteMeでは行わないようにする
+    let g:ycm_show_diagnostics_ui = 0
+
+    " コメントブロックの中でも補完を行うかどうか (default: 0)
+    let g:ycm_complete_in_comments = 1
+
+    " 文字列ブロックの中でも補完を行うかどうか (default: 1)
+    let g:ycm_complete_in_strings = 1
+
+    " コメントや文字列からも識別子を収集するかどうか (default: 0)
+    let g:ycm_collect_identifiers_from_comments_and_strings = 1
+
+    " タグファイルから識別子を収集するかどうか (default: 0)
+    let g:ycm_collect_identifiers_from_tags_files = 0
+
+    " vimのファイルタイプ別Syntaxファイルから識別子を収集するかどうか (default: 0)
+    let g:ycm_seed_identifiers_with_syntax = 1
+
+    " ログファイルを保存するかどうか。(default: 0)
+    " 保存先は :YcmDebugInfo で確認できる。
+    let g:ycm_keep_logfiles = 0
+
+    " ログレベル
+    let g:ycm_log_level = 'info'
+
+    " 補完時にプレビューウインドウに表示するかどうか (defult: 0)
+    let g:ycm_add_preview_to_completeopt = 0
+
+    " 補完完了後にプレビューウインドウを自動的に閉じるかどうか (default: 0)
+    let g:ycm_autoclose_preview_window_after_completion = 1
+
+    " 補完候補を次に進める
+    let g:ycm_key_list_select_completion = ['<C-n>', '<Down>']
+
+    " 補完候補を前に戻す
+    let g:ycm_key_list_previous_completion = ['<C-p>', '<Up>']
+
+    " 補完終了のキー (default: ['<C-y>'])
+    let g:ycm_key_list_stop_completion = ['<C-y>']
+
+    " 補完開始のキー
+    let g:ycm_key_invoke_completion = '<C-Space>'
+
+    " .ycm_extra_conf.pyのパス。 (default: '')
+    " これを指定しているとcompile_commands.jsonがロードされないので注意
+    let g:ycm_global_ycm_extra_conf = ''
+
+    " .ycm_extra_conf.pyをロードするときに、問い合わせを行うかどうか
+    " (default: 1)
+    " extra_confは使うつもりがないので、意図せずロードされてしまったときにわかる
+    " ように1にしておく。
+    let g:ycm_confirm_extra_conf = 1
+
+    " GoTo*コマンドを実行した時のバッファの開き方 (default: 'same-buffer')
+    let g:ycm_goto_buffer_command = 'same-buffer'
 
     function! s:youcompleteme_settings()
         " デフォルトのタグジャンプキーバインドを置き換える
-        " nnoremap <silent><buffer> <C-]> :<C-u>YcmCompleter GoToDefinition<CR>
         nnoremap <silent><buffer> <C-]> :<C-u>YcmCompleter GoTo<CR>
+        let g:jedi#completions_enabled = 0
     endfunction
-    AutocmdFT c,cpp,go call s:youcompleteme_settings()
+    AutocmdFT c,cpp,go,python call s:youcompleteme_settings()
 endif
 
 if ! empty(neobundle#get('vim-ref'))
@@ -2699,8 +2871,83 @@ else
         \ ]
 endif
 
+if ! empty(neobundle#get('ale'))
+    let g:ale_linters = {
+    \   'cpp': ['g++'],
+    \   'ansible': ['yamllint', 'ansible-lint'],
+    \   'python': ['flake8'],
+    \}
 
-" let g:list2tree_charset_ascii=1
+    " テキスト編集時のLintを無効化(never)
+    let g:ale_lint_on_text_changed='never'
+    " テキスト保存時にLintを実行する
+    let g:ale_lint_on_save = 1
+
+    let g:ale_sign_error = '>>'
+    let g:ale_sign_warning = '--'
+    let g:ale_echo_msg_error_str = 'E'
+    let g:ale_echo_msg_warning_str = 'W'
+    let g:ale_echo_msg_format = '[%linter%]%code%: %s'
+    " エラーがあった阿合に自動的にLocation list 又はQuickfixを開くかどうか(default: 0)
+    let g:ale_open_list = 1
+    " エラーウインドウの高さ (default: 10)
+    let g:ale_list_window_size = 5
+endif
+
+if ! empty(neobundle#get('vim-rtags'))
+    let g:rtagsAutoLaunchRdm = 1
+    let g:rtagsUseDefaultMappings = 0
+
+    noremap <Leader>ri :call rtags#SymbolInfo()<CR>
+    noremap <Leader>rj :call rtags#JumpTo(g:SAME_WINDOW)<CR>
+    noremap <Leader>rJ :call rtags#JumpTo(g:SAME_WINDOW, { '--declaration-only' : '' })<CR>
+    noremap <Leader>rp :call rtags#JumpToParent()<CR>
+    " noremap <Leader>rf :call rtags#FindRefs()<CR>
+    noremap <Leader>rf :<C-u>Unite<Space>rtags/references -no-auto-resize -vertical-preview -horizontal -winheight=10 -direction=botright<CR>
+    noremap <Leader>rF :call rtags#FindRefsCallTree()<CR>
+    " noremap <Leader>rn :call rtags#FindRefsByName(input("Pattern? ", "", "customlist,rtags#CompleteSymbols"))<CR>
+    noremap <Leader>rn :<C-u>Unite<Space>rtags/references_by_name -no-auto-resize -vertical-preview -horizontal -winheight=10 -direction=botright<CR>
+    noremap <Leader>rs :call rtags#FindSymbols(input("Pattern? ", "", "customlist,rtags#CompleteSymbols"))<CR>
+    noremap <Leader>rr :call rtags#ReindexFile()<CR>
+    noremap <Leader>rl :call rtags#ProjectList()<CR>
+    noremap <Leader>rw :call rtags#RenameSymbolUnderCursor()<CR>
+    noremap <Leader>rv :call rtags#FindVirtuals()<CR>
+    noremap <Leader>rb :call rtags#JumpBack()<CR>
+    noremap <Leader>rC :call rtags#FindSuperClasses()<CR>
+    noremap <Leader>rc :call rtags#FindSubClasses()<CR>
+    noremap <Leader>rx :<C-u>Unite<Space>rtags/find_sub_classes -no-auto-resize -vertical-preview -horizontal -winheight=10 -direction=botright<CR>
+    noremap <Leader>rd :call rtags#Diagnostics()<CR>
+endif
+
+if ! empty(neobundle#get('CompleteParameter.vim'))
+    let g:complete_parameter_use_ultisnips_mapping = 1
+    inoremap <silent><expr> ( complete_parameter#pre_complete("()")
+    let g:complete_parameter_py_keep_value = 2
+
+    " ComleteParameter.vimでcmdウインドウに関数シグネチャを表示するための設定
+    " > - Echo signature when select an item. (need to `set noshowmode` or `set cmdheight=2`)
+    set noshowmode
+endif
+
+if ! empty(neobundle#get('vim-open-googletranslate'))
+    let g:opengoogletranslate#openbrowsercmd = 'electron-open --without-focus'
+    " let g:opengoogletranslate#openbrowsercmd = 'chromium-browser'
+    let g:opengoogletranslate#default_lang = 'ja'
+endif
+
+
+if ! empty(neobundle#get('ultisnips'))
+    let g:UltiSnipsExpandTrigger       = '<c-j>'
+    let g:UltiSnipsJumpForwardTrigger  = '<c-j>'
+    let g:UltiSnipsJumpBackwardTrigger = '<c-k>'
+endif
+
+
+if ! empty(neobundle#get('vim-localvimrc'))
+    " .lvimrcをロードするときに問い合わせするかどうか(default: 1)
+    let g:localvimrc_ask = 0
+endif
+
 
 " なんか.vimrcの上の方でこの設定をすると、効いてなかったので、他のトコで上書きさ
 " れてる？とりあえず一番最後に設定することで回避する。
@@ -2712,7 +2959,3 @@ colorscheme hybrid
 set background=dark
 
 call UpdatePath()
-call SourceIfExist($HOME.'/.local.vimrc')
-if(s:is_git_dir())
-    call SourceIfExist(GitRootDir() . '/.local.vimrc')
-endif

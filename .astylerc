@@ -1,0 +1,27 @@
+# http://algo13.net/astyle/options.html
+mode=c
+style=allman
+indent=spaces=4
+# attach-namespaces
+# attach-extern-c
+indent-switches
+# indent-preproc-define
+# indent-preproc-cond
+indent-col1-comments
+max-instatement-indent=100
+pad-oper
+pad-header
+unpad-paren
+break-blocks
+align-pointer=type
+align-reference=type
+break-closing-brackets
+keep-one-line-blocks
+convert-tabs
+max-code-length=120
+break-after-logical
+lineend=linux
+
+# fill-empty-lines
+# delete-empty-lines
+# break-elseifs

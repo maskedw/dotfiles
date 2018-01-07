@@ -1,0 +1,52 @@
+Font=Consolas
+FontHeight=13
+BoldAsFont=yes
+FontSmoothing=full
+Locale=ja_JP
+Charset=UTF-8
+Transparence=high
+
+# https://github.com/oumu/mintty-color-schemes/blob/master/base16-monokai-mod.minttyrc
+# ForegroundColour=248,248,242
+# BackgroundColour=39,40,34
+# CursorColour=253,157,79
+# Black=39,40,34
+# BoldBlack=117,113,94
+# Red=249,38,114
+# BoldRed=204,6,78
+# Green=166,226,46
+# BoldGreen=122,172,24
+# Yellow=244,191,117
+# BoldYellow=240,169,69
+# Blue=102,217,239
+# BoldBlue=33,199,233
+# Magenta=174,129,255
+# BoldMagenta=126,51,255
+# Cyan=161,239,228
+# BoldCyan=95,227,210
+# White=248,248,242
+# BoldWhite=249,248,245
+
+# http://terminal.sexy/
+# NumixDarkest
+BackgroundColour=29,31,33
+ForegroundColour=197,200,198
+CursorColour=197,200,198
+Black=40,42,46
+BoldBlack=55,59,65
+Red=165,66,66
+BoldRed=204,102,102
+Green=140,148,64
+BoldGreen=181,189,104
+Yellow=222,147,95
+BoldYellow=240,198,116
+Blue=95,129,157
+BoldBlue=129,162,190
+Magenta=133,103,143
+BoldMagenta=178,148,187
+Cyan=94,141,135
+BoldCyan=138,190,183
+White=112,120,128
+BoldWhite=197,200,198
+CursorType=block
+ZoomShortcuts=no

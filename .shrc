@@ -1,0 +1,190 @@
+#!/bin/bash
+# vi: set ft=sh :
+
+# 日本語設定をした後に、CUIログインで起動すると文字化けしてしまう。この時の環境
+# 変数TERMはlinuxなので、この時は英語表記に設定する。
+# http://iwamocchan11.hatenadiary.jp/entry/2015/04/26/014616
+case $TERM in
+      linux) LANG=C ;;
+      *)     LANG=ja_JP.UTF-8;;
+esac
+
+# セグフォの時にコアダンプを出力するための設定
+# ulimit -c unlimited
+
+# sudo の後のコマンドでエイリアスを有効にする
+alias sudo='sudo '
+alias grep='grep --color=auto'
+alias rgrep='grep -r --color=auto'
+alias fgrep='fgrep --color=auto'
+alias egrep='egrep --color=auto'
+
+alias ll='ls -alF'
+alias la='ls -A'
+alias l='ls -CF'
+alias info='info --vi-keys'
+alias allgroup='cat /etc/group'
+alias alluser='cut -d: -f 1 /etc/passwd'
+
+# -2オプションをつけないと、Vimの色設定が崩れる。よくわからん。
+alias tmux='tmux -2'
+alias sudo='sudo '
+alias tree='tree --charset ascii'
+export TIMEFMT=$'\nreal\t%E\nuser\t%U\nsys\t%S'
+
+# 動作中のdeamonプロセスの表示
+# http://stackoverflow.com/questions/17991095/linux-how-to-find-the-list-of-daemon-processes-and-zombie-processes
+list_deamons() {
+    ps axo pid,ppid,pgrp,tty,tpgid,sess,comm | awk '$2==1' |awk '$1==$3'
+}
+docker_cleanall() {
+    docker rm -f "$(docker ps -aq)" &&  docker rmi -f "$(docker images -aq)"
+}
+
+# SSH 接続時にTerminalからGUIアプリが起動できるようにする設定。SSHクライアントが
+# Windowsの場合、VcXsrv等のWindowsで動作するX Serverが動作していることを前提とす
+# る。
+if [ -n "$SSH_CLIENT" ] ; then
+    export DISPLAY=$(echo "$SSH_CLIENT" | awk '{print $1}'):0.0
+
+    # http://vogel.at.webry.info/201607/article_4.html
+    export NO_AT_BRIDGE=1
+
+    # http://alfa.hatenablog.jp/entry/2016/05/19/101456
+    # 最終的に以下の設定もしておかないと日本語入力を有効にできなかったので要注意
+    #
+    # > ibusの設定
+    # > `ibus-setup` コマンドを実行して設定画面を開き下記の2点を設定します。
+    # >
+    # > `General` タブの `Next input method` に設定されているショートカットキーをすべて削除
+    # > `InputMethod` タブの `日本語 - Japanese` を削除して `日本語 - Mozc` だけにする
+    export DefaultIMModule=ibus
+    export XMODIFIERS="@im=ibus"
+    export GTK_IM_MODULE=ibus
+    export QT_IM_MODULE=ibus
+    export IBUS_ENABLE_SYNC_MODE=1
+    xset -r 49
+    # https://www49.atwiki.jp/ntemacs/pages/69.html
+    export LIBGL_ALWAYS_INDIRECT=1
+    if test `ps auxw | grep $USER | grep -v grep | grep "ibus-daemon -d -x" 2> /dev/null | wc -l` -eq 0;
+    then
+        ibus-daemon -d -x
+    fi
+fi
+
+detect=`uname | sed -e 's/\([a-zA-Z]\+\).*/\1/g'`
+if [ "$detect" = "MINGW" ] || [ "$detect" = "MSYS" ] ; then
+    alias peco='fzy'
+    alias man='winpty man'
+    alias ls='ls -h --color=auto --show-control-chars'
+    export LANG=ja_JP.UTF-8
+    export OUTPUT_CHARSET=utf-8
+    export IS_MSYS="1"
+
+    # https://github.com/hashicorp/vagrant/issues/9143
+    # Minttyでvagrant sshが正常に動作しない件の回避策。Vagrantバンドルのsshでは
+    # なく、MSYS2のsshを使用する。
+    export VAGRANT_PREFER_SYSTEM_BIN=1
+
+    # https://qiita.com/Ted-HM/items/4f2feb9fdacb6c72083c
+    # Windowsコマンド文字化け対策
+    wincmd() {
+        CMD=$1
+        shift
+        $CMD $* 2>&1 | iconv -f CP932 -t UTF-8
+    }
+    alias cmd='winpty cmd'
+    alias psh='winpty powershell'
+    alias ipconfig='wincmd ipconfig'
+    alias netstat='wincmd netstat'
+    alias netsh='wincmd netsh'
+
+    # https://github.com/erichdongubler-dotfiles/msys2/blob/master/.local/bin/xdg-open
+    # tmuxのプラグイン(tmux-open)がxdg-open()というコマンドに依存しているが、
+    # MSYS2にパッケージがないので互換関数を定義する
+    xdg-open() {
+        if [[ "$#" != 1 ]]; then
+            echo "got $# args, expected 1" &>2
+            exit
+        fi
+
+        file="$1"
+
+        if [[ -z "$file" ]]; then
+            echo "file not specified" >&2
+            exit
+        fi
+
+        if [[ ! -e "$file" ]]; then
+            echo "file $file does not exist" >&2
+            exit
+        fi
+
+        start "$(cygpath -w $file)"
+    }
+else
+    alias ls='ls --color=auto'
+    # https://rcmdnk.com/blog/2014/07/20/computer-vim/
+    # export MANPAGER="/bin/sh -c \"col -b -x|vim -R -c 'set ft=man nolist nonu noma' -\""
+fi
+
+if [ "$detect" = "MINGW" ] ; then
+    # export PATH="/c/Program Files/Git/cmd:$PATH"
+    # alias git='winpty git'
+    export PATH="/c/Python35:$PATH"
+    export PATH="/c/Python35/Scripts:$PATH"
+    export PATH="/c/Python27:$PATH"
+    export PATH="/c/Python27/Scripts:$PATH"
+    export PATH="/c/Program Files/CMake/bin:$PATH"
+    # export PATH="/c/Program Files/Git/cmd/:$PATH"
+    alias python2='winpty /c/Python27/python.exe'
+    alias python3='winpty /c/Python35/python.exe'
+    alias pip2='winpty /c/Python27/Scripts/pip2.exe'
+    alias pip3='winpty /c/Python35/Scripts/pip3.exe'
+
+    alias python=python3
+    alias pip=pip3
+fi
+
+export EDITOR=vim
+# export GOROOT=/opt/go1.8
+export PYENV_ROOT=$HOME/.pyenv
+export RBENV_ROOT=$HOME/.rbenv
+export PATH="/usr/local/go/bin:$PATH"
+export PATH="$PYENV_ROOT/bin:$PATH"
+export PATH="$RBENV_ROOT/bin:$PATH"
+export PATH="$HOME/local/tools:$PATH"
+export PATH="$HOME/Dropbox/dev/tools:$PATH"
+export PATH="$HOME/Dropbox/dev/tools-external:$PATH"
+export PATH="$HOME/Dropbox/dev/tools-private:$PATH"
+export PATH="$HOME/Dropbox/dev/tools-windows:$PATH"
+
+
+if [ "$detect" != "MINGW" ] && [ "$detect" != "MSYS" ] ; then
+    export PATH="$HOME/Dropbox/dev/tools-linux:$PATH"
+fi
+
+if [ -e "$HOME/.local.shrc" ]; then
+    source "$HOME/.local.shrc"
+fi
+
+# https://qiita.com/takc923/items/ec4729382a0e89d1b742
+# vagrant xxx サブコマンドのラッパ
+vagrant_wrapper() {
+    if [ "$1" = "snapshot" ] && [ "$2" = "pop" ]; then
+        shift 2
+        command vagrant snapshot pop --no-provision "$@"
+    else
+        command vagrant "$@"
+    fi
+}
+alias vagrant=vagrant_wrapper
+export VAGRANT_HOME=$HOME/mnt/ext/vagrant.d
+
+fasd_peco() {
+    cd "$(fasd -ld | peco)"
+}
+x2() {
+     xplorer2 "$(cygpath -w $(fasd -ld | peco))"
+}
+alias z=fasd_peco

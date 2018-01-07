@@ -1,0 +1,278 @@
+# Launguage
+# 対象としているフォーマットスタイルの言語
+# None          使わない
+# Cpp           C, C++, ObjectiveC, ObjectiveC++
+# Java          Java
+# JavaScript    JavaScript
+# Proto         Protocol Buffers (https://developers.google.com/protocol-buffers/).
+Language: Cpp
+# AccessModifierOffset
+# アクセス修飾子(public: protected: private:)のインデント
+# (IndentWidth オプションと同じ値のマイナスでインデントなし)
+AccessModifierOffset: -4
+
+# ConstructorInitializerIndentWidth
+# コンストラクタ初期化子リストのインデントに使用する文字数
+ConstructorInitializerIndentWidth: 4
+
+# AlignEscapedNewlinesLeft
+# エスケープされた改行の位置
+#
+# true
+# 可能な限り、左端に整列する
+#
+# #define TEST       \
+#   "long long test" \
+#   "string"         \
+#   "!!"
+# false
+# ColumnLimit に配置する
+#
+# #define TEST                           \
+#   "long long test"                     \
+#   "string"                             \
+#   "!!"
+AlignEscapedNewlinesLeft: false
+
+# [AlignAfterOpenBracket (bool)]
+# true の場合、開始括弧の後で水平方向に引数を整列させる。
+AlignAfterOpenBracket: true
+
+# AlignTrailingComments
+# コメントを末尾に揃える
+AlignTrailingComments: true
+
+# AllowAllParametersOfDeclarationOnNextLine
+# BinPackParametersがfalseであっても、次の行に関数宣言のすべてのパラメータを置
+# くことを許可する
+AllowAllParametersOfDeclarationOnNextLine: true
+
+AllowShortBlocksOnASingleLine: false
+AllowShortCaseLabelsOnASingleLine: false
+AllowShortIfStatementsOnASingleLine: false
+AllowShortLoopsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: All
+
+# true の場合、必ず関数定義の戻り値の型の後に改行。 より正確には「関数定義の型以
+# 下の識別子の前に改行」。 PenaltyReturnTypeOnItsOwnLine は無関係になる。
+AlwaysBreakAfterDefinitionReturnType: false
+
+# テンプレート宣言template<...>の後に改行する
+AlwaysBreakTemplateDeclarations: true
+
+# 複数行のリテラル文字列の前で改行する
+AlwaysBreakBeforeMultilineStrings: true
+
+# BreakBeforeBinaryOperators
+# 二項演算子の折り返し方法
+# None            演算子の後に改行
+# NonAssignment   割り当てていない演算子の前で改行
+# All             演算子よりも先に改行
+BreakBeforeBinaryOperators: None
+
+# BreakBeforeTernaryOperators
+# 三項演算子を、改行の後に配置する
+BreakBeforeTernaryOperators: true
+
+# BreakConstructorInitializersBeforeComma
+# コンストラクタ初期化子のコンマの前で改行し、コロンでカンマを揃えるか
+#
+# [true]
+#       class Test {
+#       public:
+#             Test()
+#                 : n(0)
+#                 , c('a') {}
+#
+#           private:
+#             int n;
+#             char c;
+#       };
+# [false]
+#       class Test {
+#       public:
+#         Test() : n(0), c('a') {}
+#
+#       private:
+#         int n;
+#         char c;
+#       };
+BreakConstructorInitializersBeforeComma: true
+
+# BinPackParameters
+# 関数呼び出しや関数定義のパラメーターを、一行ごとにするか
+BinPackParameters: true
+
+# BinPackArguments
+# false の場合、関数呼び出しの引数は、全て同じ行か、1行ごとになる。
+BinPackArguments: true
+
+# ColumnLimit
+# 最大列数
+ColumnLimit:     80
+
+# ConstructorInitializerAllOnOneLineOrOnePerLine
+# コンストラクターの初期化子が行に収まらない場合は、改行する
+ConstructorInitializerAllOnOneLineOrOnePerLine: true
+
+# ConstructorInitializerIndentWidth
+# コンストラクタ初期化子リストのインデントに使用する文字数
+ConstructorInitializerIndentWidth: 4
+
+# DerivePointerAlignment
+# true の場合``*`` や & の位置を自動判定。
+# PointerAlignment は、フォールバックとしてのみ使う
+DerivePointerAlignment: false
+
+
+# DerivePointerBinding: false
+ExperimentalAutoDetectBinPacking: false
+
+# IndentCaseLabels
+# switch ブロック内の case X: 文をインデント
+IndentCaseLabels: false
+
+# ???
+IndentWrappedFunctionNames: false
+
+# ???
+IndentFunctionDeclarationAfterType : false
+
+# MaxEmptyLinesToKeep
+# 最大連続空行数
+MaxEmptyLinesToKeep: 2
+
+# KeepEmptyLinesAtTheStartOfBlocks
+# true の場合、ブロックの開始時の空行を保持する
+KeepEmptyLinesAtTheStartOfBlocks: false
+
+# NamespaceIndentation
+# namespace のインデント
+NamespaceIndentation: None
+
+# ObjCBlockIndentWidth: 2
+# ObjCSpaceBeforeProtocolList: true
+# ObjCSpaceAfterProperty: false
+
+PenaltyBreakBeforeFirstCallParameter: 19
+PenaltyBreakComment: 60
+PenaltyBreakString: 1000
+PenaltyBreakFirstLessLess: 120
+PenaltyExcessCharacter: 1000000
+PenaltyReturnTypeOnItsOwnLine: 60
+
+# PointerAlignment
+# * や & のスタイル(DerivePointerAlignment オプションも参照)
+PointerAlignment: Left
+
+# PointerBindsToType: false
+
+# SpacesBeforeTrailingComments
+# 1行コメントの前のスペース幅
+SpacesBeforeTrailingComments: 4
+
+# ???
+Cpp11BracedListStyle: true
+
+# Standard
+# 規格との互換性
+Standard:        Auto
+
+# IndentWidth
+# インデントに使用する列数
+IndentWidth:     4
+
+# TabWidth
+# タブ幅
+TabWidth:        8
+
+# UseTab
+# タブの使い方
+#   Never          タブを使わない
+#   ForIndentation インデントのみにタブを使う
+#   Always         可能な限りタブを使う
+UseTab:          Never
+
+# BreakBeforeBraces
+# 波括弧{}のフォーマットスタイル
+# (Artistic Style(AStyle) の スタイルオプション(Bracket Style) 参照)
+#
+#   BS_Attach       常に周囲のコンテキストに波括弧{}を付ける
+#   BS_Linux        Linux風、但し、関数、namespace、 クラス定義の波括弧{}の前で改行
+#   BS_Stroustrup   Stroustrup風、但し、関数定義の前で改行
+#   BS_Allman       常に波括弧{}の前で改行
+#   BS_GNU          常に波括弧{}の前で改行。クラス以外の、関数、 または他の定義の制御文の波括弧{}にインデントレベルを追加。
+BreakBeforeBraces: Allman
+
+# SpacesInParentheses
+# 括弧()の内側のスペース
+#
+#   true    if ( a + b ) {}
+#   false   if (a + b) {}
+SpacesInParentheses: false
+
+# SpacesInSquareBrackets
+# 括弧[]の内側のスペース
+#
+#   true    a[ 1 ]
+#   false   a[1]
+SpacesInSquareBrackets: false
+
+# SpacesInAngles
+# 山括弧<>の内側のスペース(Standard オプションも参照)
+#   true   std::vector< std::vector< int > >
+#   false   std::vector<std::vector<int> >
+SpacesInAngles:  false
+
+# SpaceInEmptyParentheses
+# 空括弧()内のスペース
+#   true  func( );
+#   false func();
+SpaceInEmptyParentheses: false
+
+# SpacesInCStyleCastParentheses
+# Cスタイルのキャストのスペース
+#   true  n = ( int* )c;
+#   false n = (int*)c;
+SpacesInCStyleCastParentheses: false
+
+# SpaceAfterCStyleCast
+# Cスタイルのキャスト後のスペース
+#   true    n = (int*) c;
+#   false   n = (int*)c;
+SpaceAfterCStyleCast: false
+
+# SpaceAfterControlStatementKeyword
+# true の場合、括弧のヘッダー(例. if, for, while ...)の後に
+# スペースを挿入する
+# (バージョン3.4まで有効。それ以降のバージョンは、この項目は削除され、
+# SpaceBeforeParens: 'ControlStatements' へ変更)
+SpaceAfterControlStatementKeyword: true
+
+# SpacesInContainerLiterals
+# true の場合、コンテナリテラル(例. ObjC、 Javascript 配列、 dict リテラル) の
+# 内部にスペースを挿入する
+SpacesInContainerLiterals: true
+
+# SpaceBeforeAssignmentOperators
+# true の場合、代入演算子の前のスペースを削除しない
+SpaceBeforeAssignmentOperators: true
+
+# ContinuationIndentWidth
+# 継続行のためのインデント幅
+ContinuationIndentWidth: 4
+
+# CommentPragmas
+# 行に分割または変更すべきでない、特別な意味を持つのコメントを記述する正規表現。
+# CommentPragmas: '\*' で、doxygenコメントを無視
+CommentPragmas: '\*'
+
+ForEachMacros: foreach, Q_FOREACH, BOOST_FOREACH
+
+# SpaceBeforeParens
+# 開始括弧’(‘ の前のスペース
+#
+#   Never               開始括弧'(' の前にスペースを入れない
+#   ControlStatements   制御文のキーワード(if, for, while ...) と開始括弧'(' の間にスペースを挿入する
+#   Always              開始括弧'(' の前にスペースを挿入する
+SpaceBeforeParens: ControlStatements

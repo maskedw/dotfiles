@@ -11,6 +11,10 @@
     # autocrlf = true。その他ではautocrlf = inputとする。
     # autocrlf = true
 
+    # WindowsでもLFで別に困らんからinputでいいや。batファイルは.gitattributesで
+    # CR + LF指定をする
+    autocrlf = input
+
 [mergetool "WinMerge"]
     path = WinMergeU.exe
     cmd = \"WinMergeU.exe\" /m /r=\"$MERGED\" \"$LOCAL\" \"$BASE\" \"$REMOTE\"

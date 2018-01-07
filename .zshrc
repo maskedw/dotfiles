@@ -1,58 +1,55 @@
+#!/bin/zsh
+# vi: set ft=zsh :
+
+if [[ -s "${ZDOTDIR:-$HOME}/.zprezto/init.zsh" ]]; then
+    source "${ZDOTDIR:-$HOME}/.zprezto/init.zsh"
+
+    # ~/.zpreztorcで
+    # zstyle ':prezto:module:utility' safe-ops 'no'
+    # を設定したらいいっぽいね。
+    # # https://github.com/sorin-ionescu/prezto/issues/205
+    # # https://unix.stackexchange.com/questions/212127/zsh-disable-file-exists-warning-with-redirection
+    # # preztoを使うとcpとかが上書きしていいですか？とかの確認をするようになり煩わ
+    # # しいのでそれを無効にする設定を行う。
+    # alias cp='nocorrect cp'
+    # alias ln='nocorrect ln'
+    # alias mv='nocorrect mv'
+    # alias rm='nocorrect rm'
+    # alias cpi="${aliases[cp]:-cp} -i"
+    # alias lni="${aliases[ln]:-ln} -i"
+    # alias mvi="${aliases[mv]:-mv} -i"
+    # alias rmi="${aliases[rm]:-rm} -i"
+    # setopt clobber
+fi
+
+if type fasd > /dev/null; then
+    eval "$(fasd --init posix-alias zsh-hook)"
+fi
+
 if [ -e "$HOME/.shrc" ]; then
     source $HOME/.shrc
 fi
-if type pyenv > /dev/null; then
-    eval "$(pyenv init -)"
-fi
-if [ -d $HOME/.pyenv/plugins/pyenv-virtualenv ]; then
-    eval "$(pyenv virtualenv-init -)"
-fi
-if type rbenv > /dev/null; then
-    eval "$(rbenv init -)"
-fi
-
-# export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3
-# export WORKON_HOME=~/.virtualenvs
-# source /usr/local/bin/virtualenvwrapper.sh
-
-# ##################################################
-# # System設定
-# ##################################################
-# # セグフォの時にコアダンプを出力するための設定
-# ulimit -c unlimited
-#
-# # 日本語設定をした後に、CUIで起動すると文字化けしてしまう。この時の環境変数TERM
-# # はlinuxなので、この時は英語表記に設定する。
-# # http://iwamocchan11.hatenadiary.jp/entry/2015/04/26/014616
-# case $TERM in
-#       linux) LANG=C ;;
-#       *)     LANG=ja_JP.UTF-8;;
-# esac
-#
-# # SSH接続時にX11Forwardingのディスプレイ設定を行う
-# if [ -n "$SSH_CLIENT" ] ; then
-#     export DISPLAY=`echo $SSH_CLIENT | awk '{print $1}'`:0.0
-# fi
 
 ##################################################
 # zsh-core-settings
 ##################################################
 
-# プロンプトに色を付ける
-autoload -U colors; colors
-
-# プロンプトの設定
-#
-# 記号の意味は下記のURLが詳しい。
-# https://wiki.archlinuxjp.org/index.php/Zsh
-#
-# 現在使用している記号の意味は以下の通り
-# %m            | ホスト名               | localhost
-# %n            | ユーザ名               | root
-# %#            | ユーザ種別             | #（rootの場合）%（root以外）
-# %c            | カレントディレクトリ   | currentdir($PWD=$HOMEの場合は~）
-PROMPT='%{$fg_bold[green]%}[%m:%n:%c] %{$reset_color%}
-%# '
+if [[ ! -s "${ZDOTDIR:-$HOME}/.zprezto/init.zsh" ]]; then
+    # プロンプトに色を付ける
+    autoload -U colors; colors
+    # プロンプトの設定
+    #
+    # 記号の意味は下記のURLが詳しい。
+    # https://wiki.archlinuxjp.org/index.php/Zsh
+    #
+    # 現在使用している記号の意味は以下の通り
+    # %m            | ホスト名               | localhost
+    # %n            | ユーザ名               | root
+    # %#            | ユーザ種別             | #（rootの場合）%（root以外）
+    # %c            | カレントディレクトリ   | currentdir($PWD=$HOMEの場合は~）
+    PROMPT='%{$fg_bold[green]%}[%m:%n:%c] %{$reset_color%}
+    %# '
+fi
 
 # ヒストリの設定
 HISTFILE=~/.zsh_history
@@ -215,16 +212,6 @@ bindkey "^s" history-incremental-pattern-search-forward
 ##################################################
 # zsh-alias
 ##################################################
-# sudo の後のコマンドでエイリアスを有効にする
-alias sudo='sudo '
-alias ls='ls --color=auto'
-alias grep='grep --color=auto'
-alias fgrep='fgrep --color=auto'
-alias egrep='egrep --color=auto'
-# -2オプションをつけないと、Vimの色設定が崩れる。よくわからん。
-alias tmux='tmux -2'
-
-
 # C で標準出力をクリップボードにコピーする
 # mollifier delta blog : http://mollifier.hatenablog.com/entry/20100317/p1
 if which pbcopy >/dev/null 2>&1 ; then
@@ -242,58 +229,59 @@ fi
 # zsh-plugins
 ##################################################
 
-if [ -f ~/.zplug/init.zsh ]; then
-
-    source ~/.zplug/init.zsh
-
-    # bundleやgem、vagrantといった代表的なコマンドに対する候補を表示するようになります。
-    zplug 'zsh-users/zsh-completions'
-
-    # プロンプトのコマンドを色づけするプラグイン。
-    # 実行可能とそうでないもの（コマンド名のタイポなど）で色が変わるため、操作性が大きく向上します。
-    zplug 'zsh-users/zsh-syntax-highlighting'
-
-    # 簡単にgitルートへcdするやつ。
-    zplug "mollifier/cd-gitroot"
-
-    zplug "felixr/docker-zsh-completion"
-
-    # cd を強化する
-    zplug "b4b4r07/enhancd", use:init.sh
-
-    # # pecoのようなインタラクティブフィルタツールのラッパ。
-    # # コマンド履歴の検索や、ghqで管理しているディレクトリへの移動などの便利なシェルが
-    # # 定義されているため、自分でこれらを管理する必要がなくなります。
-    # # もちろん、pecoなどをインストールしておく必要があります
-
-    # zplug 'mollifier/anyframe'
-
-    # # 有名なインタラクティブフィルタの一つ
-    # zplug "peco/peco", as:command, from:gh-r
-
-    # # # 有名なインタラクティブフィルタの一つ
-    # # # またファイル名が fzf-bin となっているので file:fzf としてリネームする
-    # zplug "junegunn/fzf-bin", as:command, from:gh-r, rename-to:fzf
-
-    # zplug "junegunn/fzf-bin", \
-    #     from:gh-r, \
-    #     as:command, \
-    #     rename-to:fzf
-
-    # # # ターミナル上でゴミ箱チックなことをする。fzfに依存している
-    # zplug "b4b4r07/zsh-gomi"
-
-    # インストールする
-    if ! zplug check --verbose; then
-      printf 'Install? [y/N]: '
-      if read -q; then
-        echo; zplug install
-      fi
-    fi
-
-    zplug load
-    # zplug load --verbose
-fi
+# 起動に時間がかかるので、シンプルなzpreztoに乗り換えた
+# if [ -f ~/.zplug/init.zsh ]; then
+#
+#     source ~/.zplug/init.zsh
+#
+#     # bundleやgem、vagrantといった代表的なコマンドに対する候補を表示するようになります。
+#     zplug 'zsh-users/zsh-completions'
+#
+#     # プロンプトのコマンドを色づけするプラグイン。
+#     # 実行可能とそうでないもの（コマンド名のタイポなど）で色が変わるため、操作性が大きく向上します。
+#     zplug 'zsh-users/zsh-syntax-highlighting'
+#
+#     # 簡単にgitルートへcdするやつ。
+#     zplug "mollifier/cd-gitroot"
+#
+#     zplug "felixr/docker-zsh-completion"
+#
+#     # cd を強化する
+#     zplug "b4b4r07/enhancd", use:init.sh
+#
+#     # pecoのようなインタラクティブフィルタツールのラッパ。
+#     # コマンド履歴の検索や、ghqで管理しているディレクトリへの移動などの便利なシェルが
+#     # 定義されているため、自分でこれらを管理する必要がなくなります。
+#     # もちろん、pecoなどをインストールしておく必要があります
+#
+#     zplug 'mollifier/anyframe'
+#
+#     # 有名なインタラクティブフィルタの一つ
+#     zplug "peco/peco", as:command, from:gh-r
+#
+#     # # 有名なインタラクティブフィルタの一つ
+#     # # またファイル名が fzf-bin となっているので file:fzf としてリネームする
+#     zplug "junegunn/fzf-bin", as:command, from:gh-r, rename-to:fzf
+#
+#     zplug "junegunn/fzf-bin", \
+#         from:gh-r, \
+#         as:command, \
+#         rename-to:fzf
+#
+#     # # ターミナル上でゴミ箱チックなことをする。fzfに依存している
+#     zplug "b4b4r07/zsh-gomi"
+#
+#     # インストールする
+#     if ! zplug check --verbose; then
+#       printf 'Install? [y/N]: '
+#       if read -q; then
+#         echo; zplug install
+#       fi
+#     fi
+#
+#     zplug load
+#     # zplug load --verbose
+# fi
 # [peco で man を絞り込み検索する](http://qiita.com/Linda_pp/items/9ff801aa6e00459217f7)
 function peco-man-list-all() {
     local parent dir file
@@ -321,4 +309,23 @@ function peco-man() {
     fi
 }
 zle -N peco-man
+
+# Qiita: bash/zsh のヒストリを peco で便利にする
+# https://qiita.com/comuttun/items/f54e755f22508a6c7d78
+peco-select-history() {
+    BUFFER=$(history 1 | sort -k1,1nr | perl -ne 'BEGIN { my @lines = (); } s/^\s*\d+\*?\s*//; $in=$_; if (!(grep {$in eq $_} @lines)) { push(@lines, $in); print $in; }' | peco --query "$LBUFFER")
+    CURSOR=${#BUFFER}
+    zle reset-prompt
+}
+zle -N peco-select-history
+bindkey '^r' peco-select-history
+
 # bindkey -M viins '^ m' peco-man
+
+# tmux外でzshが起動された時だけtmuxを実行する
+# https://unix.stackexchange.com/questions/41274/having-tmux-load-by-default-when-a-zsh-terminal-is-launched
+if [ "$IS_MSYS" != "1" ]; then
+    if [ "$TMUX" = "" ]; then tmux; fi
+fi
+
+test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
