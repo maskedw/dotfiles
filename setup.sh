@@ -18,8 +18,7 @@
 #===============================================================================
 set -o nounset                              # Treat unset variables as an error
 
-PWD=`pwd`
-echo $PWD
+PWD=$(pwd)
 
 TARGET=".vimrc .gvimrc "
 TARGET+=" .bash_profile"
@@ -36,13 +35,13 @@ TARGET+=" .shrc"
 TARGET+=" .dircolors"
 
 for f in $TARGET ; do
-    ln -sfv $PWD/$f $HOME/$f
+    ln -sfv "$PWD/$f" "$HOME/$f"
 done
 
 TARGET=".gitconfig.unix"
 TARGET+=" .bashrc.unix"
 for f in $TARGET ; do
-    ln -sfv $PWD/$f $HOME/`echo $f | sed s/\.unix//g`
+    ln -sfv "$PWD/$f" "$HOME/${f//\.unix/}"
 done
 
-ln -sfv $PWD/vimfiles $HOME/.vim
+ln -sfv "$PWD/vimfiles" "$HOME/.vim"

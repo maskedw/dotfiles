@@ -122,40 +122,8 @@ fi
 set -o vi
 
 # マシン名'\h'はいらんので取り除く
-PS1=`echo $PS1 | sed -e 's/\\\h//g'`
-
-# qtcreator=/opt/Qt5.2.1/Tools/QtCreator/bin
-# export QT_DIR=/opt/Qt5.2.1/5.2.1/gcc_64
-# export QT_PLUGIN_PATH=${QT_DIR}/plugins
-# export CLUTTER_IM_MODULE="fcitx"
-# export DefaultIMModule="fcitx"
-# export GTK_IM_MODULE="fcitx"
-# export QT4_IM_MODULE="fcitx"
-# export QT_IM_MODULE="fcitx"
-# export PATH=${qtcreator}:usr/local/include:$PATH
-# export LD_LIBRARY_PATH=${QT_DIR}/lib:$LD_LIBRARY_PATH
-## この変数を設定しておくと、プログインロードのログが出力されるので、ハマった時
-## に有用
-# export QT_DEBUG_PLUGINS=1
-
-# export PATH="$HOME/.rbenv/bin:$PATH"
-# eval "$(rbenv init -)"
-
+PS1=${PS1//\\\h/}
 
 if [ -e "$HOME/.shrc" ]; then
-    source $HOME/.shrc
+    source "$HOME/.shrc"
 fi
-
-# if [ "$TERM" != "screen" ] && type tmux > /dev/null; then
-#     tmux
-# else
-#     if type pyenv > /dev/null; then
-#         eval "$(pyenv init -)"
-#     fi
-#     if [ -d $HOME/.pyenv/plugins/pyenv-virtualenv ]; then
-#         eval "$(pyenv virtualenv-init -)"
-#     fi
-#     if type rbenv > /dev/null; then
-#         eval "$(rbenv init -)"
-#     fi
-# fi

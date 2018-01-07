@@ -2,17 +2,31 @@ if type fasd > /dev/null; then
     eval "$(fasd --init posix-alias bash-hook)"
 fi
 
+# enable programmable completion features (you don't need to enable
+# this, if it's already enabled in /etc/bash.bashrc and /etc/profile
+# sources /etc/bash.bashrc).
+if ! shopt -oq posix; then
+  if [ -f /usr/share/bash-completion/bash_completion ]; then
+    . /usr/share/bash-completion/bash_completion
+  elif [ -f /etc/bash_completion ]; then
+    . /etc/bash_completion
+  fi
+fi
+
+
 if [ -e "$HOME/.shrc" ]; then
-    source $HOME/.shrc
+    source "$HOME/.shrc"
 fi
 
 # マシン名'\h'はいらんので取り除く
-PS1=`echo $PS1 | sed -e 's/\\\h//g'`
+PS1=${PS1//\\\h/}
 
 # Qiita: bash/zsh のヒストリを peco で便利にする
 # https://qiita.com/comuttun/items/f54e755f22508a6c7d78
 peco-select-history() {
-    declare l=$(HISTTIMEFORMAT= history | sort -k1,1nr | perl -ne 'BEGIN { my @lines = (); } s/^\s*\d+\s*//; $in=$_; if (!(grep {$in eq $_} @lines)) { push(@lines, $in); print $in; }' | peco --query "$READLINE_LINE")
+    declare l
+    HISTTIMEFORMAT=$(history | sort -k1,1nr | perl -ne 'BEGIN { my @lines = (); } s/^\s*\d+\s*//; $in=$_; if (!(grep {$in eq $_} @lines)) { push(@lines, $in); print $in; }' | peco --query "$READLINE_LINE")
+    l=$HISTTIMEFORMAT
     READLINE_LINE="$l"
     READLINE_POINT=${#l}
 }
